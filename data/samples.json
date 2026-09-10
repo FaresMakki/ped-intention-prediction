@@ -1,0 +1,2700 @@
+{
+  "version": 2,
+  "frame_count": 15,
+  "selection": {
+    "split": "test",
+    "method": "First indexed sample from five distinct videos per raw class; no correctness filtering.",
+    "class_balance": {
+      "No Crossing": 5,
+      "Crossing": 5,
+      "Irrelevant": 5
+    }
+  },
+  "samples": [
+    {
+      "id": "sample-01",
+      "display_name": "Example 01",
+      "tensor_index": 0,
+      "sample_index": 215,
+      "set_id": "set03",
+      "video_id": "video_0001",
+      "pedestrian_id": "3_1_220",
+      "class_name": "No Crossing",
+      "raw_class": 0,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 1545,
+          "url": "/media/sample-01/frame_01.jpg",
+          "target_box": [
+            1308.57,
+            722.36,
+            1327.3,
+            786.4
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 1546,
+          "url": "/media/sample-01/frame_02.jpg",
+          "target_box": [
+            1315.23,
+            721.69,
+            1334.05,
+            787.06
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 1547,
+          "url": "/media/sample-01/frame_03.jpg",
+          "target_box": [
+            1321.88,
+            721.03,
+            1340.79,
+            787.73
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 1548,
+          "url": "/media/sample-01/frame_04.jpg",
+          "target_box": [
+            1328.54,
+            720.36,
+            1347.54,
+            788.39
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 1549,
+          "url": "/media/sample-01/frame_05.jpg",
+          "target_box": [
+            1335.2,
+            719.7,
+            1354.28,
+            789.05
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 1550,
+          "url": "/media/sample-01/frame_06.jpg",
+          "target_box": [
+            1341.86,
+            719.03,
+            1361.03,
+            789.72
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 1551,
+          "url": "/media/sample-01/frame_07.jpg",
+          "target_box": [
+            1348.51,
+            718.37,
+            1367.77,
+            790.38
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 1552,
+          "url": "/media/sample-01/frame_08.jpg",
+          "target_box": [
+            1355.17,
+            717.7,
+            1374.52,
+            791.05
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 1553,
+          "url": "/media/sample-01/frame_09.jpg",
+          "target_box": [
+            1361.83,
+            717.04,
+            1381.26,
+            791.71
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 1554,
+          "url": "/media/sample-01/frame_10.jpg",
+          "target_box": [
+            1368.49,
+            716.37,
+            1388.01,
+            792.37
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 1555,
+          "url": "/media/sample-01/frame_11.jpg",
+          "target_box": [
+            1375.14,
+            715.71,
+            1394.75,
+            793.04
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 1556,
+          "url": "/media/sample-01/frame_12.jpg",
+          "target_box": [
+            1381.8,
+            715.04,
+            1401.5,
+            793.7
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 1557,
+          "url": "/media/sample-01/frame_13.jpg",
+          "target_box": [
+            1389.66,
+            714.37,
+            1410.56,
+            795.01
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 1558,
+          "url": "/media/sample-01/frame_14.jpg",
+          "target_box": [
+            1397.52,
+            713.71,
+            1419.63,
+            796.32
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 1559,
+          "url": "/media/sample-01/frame_15.jpg",
+          "target_box": [
+            1405.38,
+            713.04,
+            1428.69,
+            797.64
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-02",
+      "display_name": "Example 02",
+      "tensor_index": 1,
+      "sample_index": 256,
+      "set_id": "set03",
+      "video_id": "video_0002",
+      "pedestrian_id": "3_2_270",
+      "class_name": "No Crossing",
+      "raw_class": 0,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 801,
+          "url": "/media/sample-02/frame_01.jpg",
+          "target_box": [
+            1590.7,
+            681.69,
+            1654.52,
+            866.48
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 802,
+          "url": "/media/sample-02/frame_02.jpg",
+          "target_box": [
+            1595.24,
+            680.59,
+            1660.65,
+            867.05
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 803,
+          "url": "/media/sample-02/frame_03.jpg",
+          "target_box": [
+            1599.77,
+            679.49,
+            1666.78,
+            867.62
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 804,
+          "url": "/media/sample-02/frame_04.jpg",
+          "target_box": [
+            1604.31,
+            678.39,
+            1672.91,
+            868.19
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 805,
+          "url": "/media/sample-02/frame_05.jpg",
+          "target_box": [
+            1608.85,
+            677.28,
+            1679.04,
+            868.76
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 806,
+          "url": "/media/sample-02/frame_06.jpg",
+          "target_box": [
+            1613.39,
+            676.18,
+            1685.17,
+            869.33
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 807,
+          "url": "/media/sample-02/frame_07.jpg",
+          "target_box": [
+            1617.93,
+            675.08,
+            1691.3,
+            869.9
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 808,
+          "url": "/media/sample-02/frame_08.jpg",
+          "target_box": [
+            1624.14,
+            674.11,
+            1698.92,
+            870.96
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 809,
+          "url": "/media/sample-02/frame_09.jpg",
+          "target_box": [
+            1630.36,
+            673.14,
+            1706.54,
+            872.02
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 810,
+          "url": "/media/sample-02/frame_10.jpg",
+          "target_box": [
+            1636.57,
+            672.17,
+            1714.16,
+            873.08
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 811,
+          "url": "/media/sample-02/frame_11.jpg",
+          "target_box": [
+            1642.78,
+            671.2,
+            1721.78,
+            874.14
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 812,
+          "url": "/media/sample-02/frame_12.jpg",
+          "target_box": [
+            1648.99,
+            670.23,
+            1729.4,
+            875.2
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 813,
+          "url": "/media/sample-02/frame_13.jpg",
+          "target_box": [
+            1655.21,
+            669.26,
+            1737.02,
+            876.26
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 814,
+          "url": "/media/sample-02/frame_14.jpg",
+          "target_box": [
+            1661.42,
+            668.29,
+            1744.64,
+            877.32
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 815,
+          "url": "/media/sample-02/frame_15.jpg",
+          "target_box": [
+            1667.63,
+            667.32,
+            1752.26,
+            878.38
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-03",
+      "display_name": "Example 03",
+      "tensor_index": 2,
+      "sample_index": 296,
+      "set_id": "set03",
+      "video_id": "video_0003",
+      "pedestrian_id": "3_3_315",
+      "class_name": "No Crossing",
+      "raw_class": 0,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 10347,
+          "url": "/media/sample-03/frame_01.jpg",
+          "target_box": [
+            1449.44,
+            702.9,
+            1475.05,
+            814.65
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 10348,
+          "url": "/media/sample-03/frame_02.jpg",
+          "target_box": [
+            1454.91,
+            700.42,
+            1480.52,
+            812.16
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 10349,
+          "url": "/media/sample-03/frame_03.jpg",
+          "target_box": [
+            1459.49,
+            700.72,
+            1485.7,
+            814.15
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 10350,
+          "url": "/media/sample-03/frame_04.jpg",
+          "target_box": [
+            1464.07,
+            701.02,
+            1490.87,
+            816.14
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 10351,
+          "url": "/media/sample-03/frame_05.jpg",
+          "target_box": [
+            1468.65,
+            701.31,
+            1496.05,
+            818.12
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 10352,
+          "url": "/media/sample-03/frame_06.jpg",
+          "target_box": [
+            1473.23,
+            701.61,
+            1501.22,
+            820.11
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 10353,
+          "url": "/media/sample-03/frame_07.jpg",
+          "target_box": [
+            1477.81,
+            701.91,
+            1506.4,
+            822.1
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 10354,
+          "url": "/media/sample-03/frame_08.jpg",
+          "target_box": [
+            1481.94,
+            700.57,
+            1510.84,
+            821.9
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 10355,
+          "url": "/media/sample-03/frame_09.jpg",
+          "target_box": [
+            1486.07,
+            699.23,
+            1515.28,
+            821.7
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 10356,
+          "url": "/media/sample-03/frame_10.jpg",
+          "target_box": [
+            1490.19,
+            697.88,
+            1519.72,
+            821.5
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 10357,
+          "url": "/media/sample-03/frame_11.jpg",
+          "target_box": [
+            1494.32,
+            696.54,
+            1524.16,
+            821.3
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 10358,
+          "url": "/media/sample-03/frame_12.jpg",
+          "target_box": [
+            1498.45,
+            695.2,
+            1528.6,
+            821.1
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 10359,
+          "url": "/media/sample-03/frame_13.jpg",
+          "target_box": [
+            1503.4,
+            693.55,
+            1533.55,
+            821.52
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 10360,
+          "url": "/media/sample-03/frame_14.jpg",
+          "target_box": [
+            1508.35,
+            691.9,
+            1538.51,
+            821.94
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 10361,
+          "url": "/media/sample-03/frame_15.jpg",
+          "target_box": [
+            1513.31,
+            690.25,
+            1543.46,
+            822.36
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-04",
+      "display_name": "Example 04",
+      "tensor_index": 3,
+      "sample_index": 318,
+      "set_id": "set03",
+      "video_id": "video_0004",
+      "pedestrian_id": "3_4_344",
+      "class_name": "No Crossing",
+      "raw_class": 0,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 1584,
+          "url": "/media/sample-04/frame_01.jpg",
+          "target_box": [
+            1110.8,
+            721.55,
+            1136.24,
+            823.2
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 1585,
+          "url": "/media/sample-04/frame_02.jpg",
+          "target_box": [
+            1114.81,
+            720.4,
+            1141.11,
+            824.48
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 1586,
+          "url": "/media/sample-04/frame_03.jpg",
+          "target_box": [
+            1118.83,
+            719.26,
+            1145.98,
+            825.76
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 1587,
+          "url": "/media/sample-04/frame_04.jpg",
+          "target_box": [
+            1122.84,
+            718.11,
+            1150.86,
+            827.04
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 1588,
+          "url": "/media/sample-04/frame_05.jpg",
+          "target_box": [
+            1126.86,
+            716.97,
+            1155.73,
+            828.32
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 1589,
+          "url": "/media/sample-04/frame_06.jpg",
+          "target_box": [
+            1130.87,
+            715.82,
+            1160.6,
+            829.6
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 1590,
+          "url": "/media/sample-04/frame_07.jpg",
+          "target_box": [
+            1135.53,
+            715.53,
+            1165.98,
+            831.18
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 1591,
+          "url": "/media/sample-04/frame_08.jpg",
+          "target_box": [
+            1140.19,
+            715.25,
+            1171.36,
+            832.76
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 1592,
+          "url": "/media/sample-04/frame_09.jpg",
+          "target_box": [
+            1144.84,
+            714.96,
+            1176.74,
+            834.34
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 1593,
+          "url": "/media/sample-04/frame_10.jpg",
+          "target_box": [
+            1149.5,
+            714.68,
+            1182.12,
+            835.92
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 1594,
+          "url": "/media/sample-04/frame_11.jpg",
+          "target_box": [
+            1154.16,
+            714.39,
+            1187.5,
+            837.5
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 1595,
+          "url": "/media/sample-04/frame_12.jpg",
+          "target_box": [
+            1160.32,
+            712.88,
+            1193.66,
+            839.22
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 1596,
+          "url": "/media/sample-04/frame_13.jpg",
+          "target_box": [
+            1166.48,
+            711.38,
+            1199.82,
+            840.94
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 1597,
+          "url": "/media/sample-04/frame_14.jpg",
+          "target_box": [
+            1172.65,
+            709.87,
+            1205.99,
+            842.66
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 1598,
+          "url": "/media/sample-04/frame_15.jpg",
+          "target_box": [
+            1178.81,
+            708.37,
+            1212.15,
+            844.38
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-05",
+      "display_name": "Example 05",
+      "tensor_index": 4,
+      "sample_index": 350,
+      "set_id": "set03",
+      "video_id": "video_0005",
+      "pedestrian_id": "3_5_384",
+      "class_name": "No Crossing",
+      "raw_class": 0,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 1606,
+          "url": "/media/sample-05/frame_01.jpg",
+          "target_box": [
+            1204.49,
+            720.96,
+            1240.21,
+            835.95
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 1607,
+          "url": "/media/sample-05/frame_02.jpg",
+          "target_box": [
+            1205.47,
+            719.8,
+            1241.63,
+            835.71
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 1608,
+          "url": "/media/sample-05/frame_03.jpg",
+          "target_box": [
+            1206.45,
+            718.63,
+            1243.06,
+            835.47
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 1609,
+          "url": "/media/sample-05/frame_04.jpg",
+          "target_box": [
+            1207.43,
+            717.47,
+            1244.48,
+            835.23
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 1610,
+          "url": "/media/sample-05/frame_05.jpg",
+          "target_box": [
+            1208.4,
+            716.31,
+            1245.9,
+            835.0
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 1611,
+          "url": "/media/sample-05/frame_06.jpg",
+          "target_box": [
+            1209.38,
+            715.14,
+            1247.32,
+            834.76
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 1612,
+          "url": "/media/sample-05/frame_07.jpg",
+          "target_box": [
+            1210.36,
+            713.98,
+            1248.74,
+            834.52
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 1613,
+          "url": "/media/sample-05/frame_08.jpg",
+          "target_box": [
+            1212.25,
+            713.27,
+            1251.08,
+            834.74
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 1614,
+          "url": "/media/sample-05/frame_09.jpg",
+          "target_box": [
+            1214.14,
+            712.57,
+            1253.41,
+            834.96
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 1615,
+          "url": "/media/sample-05/frame_10.jpg",
+          "target_box": [
+            1216.03,
+            711.86,
+            1255.75,
+            835.17
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 1616,
+          "url": "/media/sample-05/frame_11.jpg",
+          "target_box": [
+            1217.92,
+            711.15,
+            1258.08,
+            835.39
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 1617,
+          "url": "/media/sample-05/frame_12.jpg",
+          "target_box": [
+            1219.82,
+            710.44,
+            1260.42,
+            835.61
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 1618,
+          "url": "/media/sample-05/frame_13.jpg",
+          "target_box": [
+            1221.71,
+            709.74,
+            1262.76,
+            835.83
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 1619,
+          "url": "/media/sample-05/frame_14.jpg",
+          "target_box": [
+            1223.6,
+            709.03,
+            1265.09,
+            836.05
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 1620,
+          "url": "/media/sample-05/frame_15.jpg",
+          "target_box": [
+            1225.49,
+            708.32,
+            1267.43,
+            836.26
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-06",
+      "display_name": "Example 06",
+      "tensor_index": 5,
+      "sample_index": 253,
+      "set_id": "set03",
+      "video_id": "video_0001",
+      "pedestrian_id": "3_1_267",
+      "class_name": "Crossing",
+      "raw_class": 1,
+      "binary_target": 1,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 17008,
+          "url": "/media/sample-06/frame_01.jpg",
+          "target_box": [
+            489.5,
+            704.57,
+            528.88,
+            840.4
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 17009,
+          "url": "/media/sample-06/frame_02.jpg",
+          "target_box": [
+            488.73,
+            704.46,
+            528.21,
+            840.6
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 17010,
+          "url": "/media/sample-06/frame_03.jpg",
+          "target_box": [
+            487.96,
+            704.34,
+            527.53,
+            840.8
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 17011,
+          "url": "/media/sample-06/frame_04.jpg",
+          "target_box": [
+            487.2,
+            704.23,
+            526.86,
+            841.0
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 17012,
+          "url": "/media/sample-06/frame_05.jpg",
+          "target_box": [
+            486.43,
+            704.12,
+            526.19,
+            841.2
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 17013,
+          "url": "/media/sample-06/frame_06.jpg",
+          "target_box": [
+            485.66,
+            704.01,
+            525.52,
+            841.4
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 17014,
+          "url": "/media/sample-06/frame_07.jpg",
+          "target_box": [
+            484.89,
+            703.89,
+            524.84,
+            841.6
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 17015,
+          "url": "/media/sample-06/frame_08.jpg",
+          "target_box": [
+            484.12,
+            703.78,
+            524.17,
+            841.8
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 17016,
+          "url": "/media/sample-06/frame_09.jpg",
+          "target_box": [
+            483.35,
+            703.67,
+            523.5,
+            842.0
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 17017,
+          "url": "/media/sample-06/frame_10.jpg",
+          "target_box": [
+            483.35,
+            703.67,
+            523.5,
+            842.0
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 17018,
+          "url": "/media/sample-06/frame_11.jpg",
+          "target_box": [
+            483.35,
+            703.67,
+            523.5,
+            842.0
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 17019,
+          "url": "/media/sample-06/frame_12.jpg",
+          "target_box": [
+            483.35,
+            703.67,
+            523.5,
+            842.0
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 17020,
+          "url": "/media/sample-06/frame_13.jpg",
+          "target_box": [
+            481.81,
+            703.09,
+            522.22,
+            842.4
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 17021,
+          "url": "/media/sample-06/frame_14.jpg",
+          "target_box": [
+            480.27,
+            702.52,
+            520.94,
+            842.79
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 17022,
+          "url": "/media/sample-06/frame_15.jpg",
+          "target_box": [
+            478.72,
+            701.94,
+            519.66,
+            843.19
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-07",
+      "display_name": "Example 07",
+      "tensor_index": 6,
+      "sample_index": 274,
+      "set_id": "set03",
+      "video_id": "video_0002",
+      "pedestrian_id": "3_2_289",
+      "class_name": "Crossing",
+      "raw_class": 1,
+      "binary_target": 1,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 5610,
+          "url": "/media/sample-07/frame_01.jpg",
+          "target_box": [
+            421.0,
+            672.8,
+            460.23,
+            830.94
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 5611,
+          "url": "/media/sample-07/frame_02.jpg",
+          "target_box": [
+            415.27,
+            671.78,
+            455.2,
+            831.77
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 5612,
+          "url": "/media/sample-07/frame_03.jpg",
+          "target_box": [
+            409.53,
+            670.77,
+            450.18,
+            832.6
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 5613,
+          "url": "/media/sample-07/frame_04.jpg",
+          "target_box": [
+            403.8,
+            669.75,
+            445.15,
+            833.44
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 5614,
+          "url": "/media/sample-07/frame_05.jpg",
+          "target_box": [
+            398.06,
+            668.74,
+            440.13,
+            834.27
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 5615,
+          "url": "/media/sample-07/frame_06.jpg",
+          "target_box": [
+            392.33,
+            667.72,
+            435.1,
+            835.1
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 5616,
+          "url": "/media/sample-07/frame_07.jpg",
+          "target_box": [
+            386.48,
+            666.71,
+            429.48,
+            835.64
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 5617,
+          "url": "/media/sample-07/frame_08.jpg",
+          "target_box": [
+            380.63,
+            665.69,
+            423.86,
+            836.18
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 5618,
+          "url": "/media/sample-07/frame_09.jpg",
+          "target_box": [
+            374.77,
+            664.68,
+            418.24,
+            836.72
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 5619,
+          "url": "/media/sample-07/frame_10.jpg",
+          "target_box": [
+            368.92,
+            663.66,
+            412.62,
+            837.26
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 5620,
+          "url": "/media/sample-07/frame_11.jpg",
+          "target_box": [
+            363.07,
+            662.65,
+            407.0,
+            837.8
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 5621,
+          "url": "/media/sample-07/frame_12.jpg",
+          "target_box": [
+            356.74,
+            661.1,
+            401.14,
+            837.92
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 5622,
+          "url": "/media/sample-07/frame_13.jpg",
+          "target_box": [
+            350.41,
+            659.54,
+            395.28,
+            838.04
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 5623,
+          "url": "/media/sample-07/frame_14.jpg",
+          "target_box": [
+            344.08,
+            657.99,
+            389.42,
+            838.16
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 5624,
+          "url": "/media/sample-07/frame_15.jpg",
+          "target_box": [
+            337.75,
+            656.43,
+            383.56,
+            838.28
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-08",
+      "display_name": "Example 08",
+      "tensor_index": 7,
+      "sample_index": 291,
+      "set_id": "set03",
+      "video_id": "video_0003",
+      "pedestrian_id": "3_3_307",
+      "class_name": "Crossing",
+      "raw_class": 1,
+      "binary_target": 1,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 2361,
+          "url": "/media/sample-08/frame_01.jpg",
+          "target_box": [
+            1579.96,
+            630.61,
+            1667.27,
+            924.84
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 2362,
+          "url": "/media/sample-08/frame_02.jpg",
+          "target_box": [
+            1574.18,
+            630.3,
+            1661.48,
+            927.12
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 2363,
+          "url": "/media/sample-08/frame_03.jpg",
+          "target_box": [
+            1568.39,
+            630.0,
+            1655.69,
+            929.4
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 2364,
+          "url": "/media/sample-08/frame_04.jpg",
+          "target_box": [
+            1558.79,
+            632.59,
+            1656.91,
+            932.9
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 2365,
+          "url": "/media/sample-08/frame_05.jpg",
+          "target_box": [
+            1549.19,
+            635.18,
+            1658.13,
+            936.4
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 2366,
+          "url": "/media/sample-08/frame_06.jpg",
+          "target_box": [
+            1539.6,
+            637.76,
+            1659.36,
+            939.9
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 2367,
+          "url": "/media/sample-08/frame_07.jpg",
+          "target_box": [
+            1530.0,
+            640.35,
+            1660.58,
+            943.4
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 2368,
+          "url": "/media/sample-08/frame_08.jpg",
+          "target_box": [
+            1520.4,
+            642.94,
+            1661.8,
+            946.9
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 2369,
+          "url": "/media/sample-08/frame_09.jpg",
+          "target_box": [
+            1517.35,
+            641.71,
+            1653.88,
+            949.03
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 2370,
+          "url": "/media/sample-08/frame_10.jpg",
+          "target_box": [
+            1514.31,
+            640.48,
+            1645.96,
+            951.16
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 2371,
+          "url": "/media/sample-08/frame_11.jpg",
+          "target_box": [
+            1511.26,
+            639.26,
+            1638.04,
+            953.3
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 2372,
+          "url": "/media/sample-08/frame_12.jpg",
+          "target_box": [
+            1508.22,
+            638.03,
+            1630.12,
+            955.43
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 2373,
+          "url": "/media/sample-08/frame_13.jpg",
+          "target_box": [
+            1505.17,
+            636.8,
+            1622.2,
+            957.56
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 2374,
+          "url": "/media/sample-08/frame_14.jpg",
+          "target_box": [
+            1498.32,
+            636.65,
+            1609.68,
+            959.23
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 2375,
+          "url": "/media/sample-08/frame_15.jpg",
+          "target_box": [
+            1491.46,
+            636.5,
+            1597.16,
+            960.9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-09",
+      "display_name": "Example 09",
+      "tensor_index": 8,
+      "sample_index": 322,
+      "set_id": "set03",
+      "video_id": "video_0004",
+      "pedestrian_id": "3_4_350",
+      "class_name": "Crossing",
+      "raw_class": 1,
+      "binary_target": 1,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 9424,
+          "url": "/media/sample-09/frame_01.jpg",
+          "target_box": [
+            1047.41,
+            740.18,
+            1069.7,
+            784.52
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 9425,
+          "url": "/media/sample-09/frame_02.jpg",
+          "target_box": [
+            1046.91,
+            738.99,
+            1067.7,
+            783.72
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 9426,
+          "url": "/media/sample-09/frame_03.jpg",
+          "target_box": [
+            1046.42,
+            737.79,
+            1065.7,
+            782.91
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 9427,
+          "url": "/media/sample-09/frame_04.jpg",
+          "target_box": [
+            1045.92,
+            736.6,
+            1063.7,
+            782.11
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 9428,
+          "url": "/media/sample-09/frame_05.jpg",
+          "target_box": [
+            1045.42,
+            735.4,
+            1061.7,
+            781.3
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 9429,
+          "url": "/media/sample-09/frame_06.jpg",
+          "target_box": [
+            1043.93,
+            735.4,
+            1060.21,
+            781.3
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 9430,
+          "url": "/media/sample-09/frame_07.jpg",
+          "target_box": [
+            1040.2,
+            736.9,
+            1061.2,
+            782.79
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 9431,
+          "url": "/media/sample-09/frame_08.jpg",
+          "target_box": [
+            1039.7,
+            738.39,
+            1060.7,
+            784.28
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 9432,
+          "url": "/media/sample-09/frame_09.jpg",
+          "target_box": [
+            1039.2,
+            739.88,
+            1060.2,
+            785.78
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 9433,
+          "url": "/media/sample-09/frame_10.jpg",
+          "target_box": [
+            1039.2,
+            739.88,
+            1060.2,
+            785.78
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 9434,
+          "url": "/media/sample-09/frame_11.jpg",
+          "target_box": [
+            1039.2,
+            739.88,
+            1060.2,
+            785.78
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 9435,
+          "url": "/media/sample-09/frame_12.jpg",
+          "target_box": [
+            1037.71,
+            740.63,
+            1058.71,
+            786.53
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 9436,
+          "url": "/media/sample-09/frame_13.jpg",
+          "target_box": [
+            1031.73,
+            742.12,
+            1057.5,
+            788.02
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 9437,
+          "url": "/media/sample-09/frame_14.jpg",
+          "target_box": [
+            1031.73,
+            742.12,
+            1054.1,
+            788.02
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 9438,
+          "url": "/media/sample-09/frame_15.jpg",
+          "target_box": [
+            1028.75,
+            743.62,
+            1046.0,
+            791.0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-10",
+      "display_name": "Example 10",
+      "tensor_index": 9,
+      "sample_index": 359,
+      "set_id": "set03",
+      "video_id": "video_0005",
+      "pedestrian_id": "3_5_396",
+      "class_name": "Crossing",
+      "raw_class": 1,
+      "binary_target": 1,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 3127,
+          "url": "/media/sample-10/frame_01.jpg",
+          "target_box": [
+            1721.44,
+            643.63,
+            1808.1,
+            945.81
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 3128,
+          "url": "/media/sample-10/frame_02.jpg",
+          "target_box": [
+            1719.12,
+            643.72,
+            1805.59,
+            947.08
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 3129,
+          "url": "/media/sample-10/frame_03.jpg",
+          "target_box": [
+            1716.79,
+            643.81,
+            1803.08,
+            948.35
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 3130,
+          "url": "/media/sample-10/frame_04.jpg",
+          "target_box": [
+            1714.47,
+            643.91,
+            1800.57,
+            949.62
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 3131,
+          "url": "/media/sample-10/frame_05.jpg",
+          "target_box": [
+            1712.15,
+            644.0,
+            1798.07,
+            950.9
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 3132,
+          "url": "/media/sample-10/frame_06.jpg",
+          "target_box": [
+            1709.83,
+            644.09,
+            1795.56,
+            952.17
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 3133,
+          "url": "/media/sample-10/frame_07.jpg",
+          "target_box": [
+            1707.5,
+            644.18,
+            1793.05,
+            953.44
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 3134,
+          "url": "/media/sample-10/frame_08.jpg",
+          "target_box": [
+            1705.18,
+            644.28,
+            1790.54,
+            954.71
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 3135,
+          "url": "/media/sample-10/frame_09.jpg",
+          "target_box": [
+            1702.86,
+            644.37,
+            1788.03,
+            955.98
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 3136,
+          "url": "/media/sample-10/frame_10.jpg",
+          "target_box": [
+            1700.54,
+            644.46,
+            1785.52,
+            957.25
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 3137,
+          "url": "/media/sample-10/frame_11.jpg",
+          "target_box": [
+            1698.22,
+            644.56,
+            1783.01,
+            958.53
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 3138,
+          "url": "/media/sample-10/frame_12.jpg",
+          "target_box": [
+            1695.9,
+            644.65,
+            1780.5,
+            959.8
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 3139,
+          "url": "/media/sample-10/frame_13.jpg",
+          "target_box": [
+            1693.42,
+            644.77,
+            1777.28,
+            959.92
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 3140,
+          "url": "/media/sample-10/frame_14.jpg",
+          "target_box": [
+            1690.94,
+            644.9,
+            1774.06,
+            960.05
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 3141,
+          "url": "/media/sample-10/frame_15.jpg",
+          "target_box": [
+            1688.46,
+            645.02,
+            1770.84,
+            960.17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-11",
+      "display_name": "Example 11",
+      "tensor_index": 10,
+      "sample_index": 231,
+      "set_id": "set03",
+      "video_id": "video_0001",
+      "pedestrian_id": "3_1_236",
+      "class_name": "Irrelevant",
+      "raw_class": -1,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 4325,
+          "url": "/media/sample-11/frame_01.jpg",
+          "target_box": [
+            619.19,
+            658.03,
+            748.96,
+            1010.83
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 4326,
+          "url": "/media/sample-11/frame_02.jpg",
+          "target_box": [
+            616.23,
+            657.04,
+            745.89,
+            1011.49
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 4327,
+          "url": "/media/sample-11/frame_03.jpg",
+          "target_box": [
+            613.27,
+            656.05,
+            742.82,
+            1012.15
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 4328,
+          "url": "/media/sample-11/frame_04.jpg",
+          "target_box": [
+            610.31,
+            655.07,
+            739.75,
+            1012.81
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 4329,
+          "url": "/media/sample-11/frame_05.jpg",
+          "target_box": [
+            607.34,
+            654.08,
+            736.68,
+            1013.46
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 4330,
+          "url": "/media/sample-11/frame_06.jpg",
+          "target_box": [
+            604.38,
+            653.09,
+            733.61,
+            1014.12
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 4331,
+          "url": "/media/sample-11/frame_07.jpg",
+          "target_box": [
+            601.42,
+            652.1,
+            730.54,
+            1014.78
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 4332,
+          "url": "/media/sample-11/frame_08.jpg",
+          "target_box": [
+            598.46,
+            651.12,
+            727.47,
+            1015.44
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 4333,
+          "url": "/media/sample-11/frame_09.jpg",
+          "target_box": [
+            595.5,
+            650.13,
+            724.4,
+            1016.1
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 4334,
+          "url": "/media/sample-11/frame_10.jpg",
+          "target_box": [
+            592.43,
+            649.35,
+            721.33,
+            1017.2
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 4335,
+          "url": "/media/sample-11/frame_11.jpg",
+          "target_box": [
+            589.36,
+            648.56,
+            718.26,
+            1018.29
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 4336,
+          "url": "/media/sample-11/frame_12.jpg",
+          "target_box": [
+            586.29,
+            647.78,
+            715.19,
+            1019.39
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 4337,
+          "url": "/media/sample-11/frame_13.jpg",
+          "target_box": [
+            583.22,
+            647.0,
+            712.12,
+            1020.48
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 4338,
+          "url": "/media/sample-11/frame_14.jpg",
+          "target_box": [
+            580.15,
+            646.21,
+            709.05,
+            1021.58
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 4339,
+          "url": "/media/sample-11/frame_15.jpg",
+          "target_box": [
+            577.08,
+            645.43,
+            705.98,
+            1022.68
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-12",
+      "display_name": "Example 12",
+      "tensor_index": 11,
+      "sample_index": 264,
+      "set_id": "set03",
+      "video_id": "video_0002",
+      "pedestrian_id": "3_2_278",
+      "class_name": "Irrelevant",
+      "raw_class": -1,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 4057,
+          "url": "/media/sample-12/frame_01.jpg",
+          "target_box": [
+            475.48,
+            700.5,
+            535.7,
+            821.97
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 4058,
+          "url": "/media/sample-12/frame_02.jpg",
+          "target_box": [
+            469.47,
+            700.24,
+            531.5,
+            823.1
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 4059,
+          "url": "/media/sample-12/frame_03.jpg",
+          "target_box": [
+            463.46,
+            699.98,
+            527.3,
+            824.23
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 4060,
+          "url": "/media/sample-12/frame_04.jpg",
+          "target_box": [
+            457.45,
+            699.72,
+            523.1,
+            825.35
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 4061,
+          "url": "/media/sample-12/frame_05.jpg",
+          "target_box": [
+            451.44,
+            699.46,
+            518.9,
+            826.48
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 4062,
+          "url": "/media/sample-12/frame_06.jpg",
+          "target_box": [
+            445.43,
+            699.2,
+            514.7,
+            827.61
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 4063,
+          "url": "/media/sample-12/frame_07.jpg",
+          "target_box": [
+            440.32,
+            699.2,
+            507.78,
+            829.86
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 4064,
+          "url": "/media/sample-12/frame_08.jpg",
+          "target_box": [
+            435.21,
+            699.2,
+            500.86,
+            832.11
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 4065,
+          "url": "/media/sample-12/frame_09.jpg",
+          "target_box": [
+            430.11,
+            699.2,
+            493.94,
+            834.37
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 4066,
+          "url": "/media/sample-12/frame_10.jpg",
+          "target_box": [
+            425.0,
+            699.2,
+            487.02,
+            836.62
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 4067,
+          "url": "/media/sample-12/frame_11.jpg",
+          "target_box": [
+            419.89,
+            699.2,
+            480.1,
+            838.87
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 4068,
+          "url": "/media/sample-12/frame_12.jpg",
+          "target_box": [
+            410.05,
+            699.02,
+            470.26,
+            841.65
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 4069,
+          "url": "/media/sample-12/frame_13.jpg",
+          "target_box": [
+            400.21,
+            698.84,
+            460.42,
+            844.43
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 4070,
+          "url": "/media/sample-12/frame_14.jpg",
+          "target_box": [
+            390.36,
+            698.66,
+            450.57,
+            847.21
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 4071,
+          "url": "/media/sample-12/frame_15.jpg",
+          "target_box": [
+            380.52,
+            698.48,
+            440.73,
+            849.99
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-13",
+      "display_name": "Example 13",
+      "tensor_index": 12,
+      "sample_index": 294,
+      "set_id": "set03",
+      "video_id": "video_0003",
+      "pedestrian_id": "3_3_313",
+      "class_name": "Irrelevant",
+      "raw_class": -1,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 8113,
+          "url": "/media/sample-13/frame_01.jpg",
+          "target_box": [
+            1429.08,
+            698.42,
+            1472.5,
+            879.1
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 8114,
+          "url": "/media/sample-13/frame_02.jpg",
+          "target_box": [
+            1434.49,
+            697.74,
+            1477.98,
+            880.1
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 8115,
+          "url": "/media/sample-13/frame_03.jpg",
+          "target_box": [
+            1439.9,
+            697.06,
+            1483.46,
+            881.1
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 8116,
+          "url": "/media/sample-13/frame_04.jpg",
+          "target_box": [
+            1445.31,
+            696.38,
+            1488.94,
+            882.1
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 8117,
+          "url": "/media/sample-13/frame_05.jpg",
+          "target_box": [
+            1450.72,
+            695.7,
+            1494.42,
+            883.1
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 8118,
+          "url": "/media/sample-13/frame_06.jpg",
+          "target_box": [
+            1456.13,
+            695.02,
+            1499.9,
+            884.1
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 8119,
+          "url": "/media/sample-13/frame_07.jpg",
+          "target_box": [
+            1462.94,
+            694.02,
+            1507.42,
+            885.46
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 8120,
+          "url": "/media/sample-13/frame_08.jpg",
+          "target_box": [
+            1469.75,
+            693.01,
+            1514.94,
+            886.82
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 8121,
+          "url": "/media/sample-13/frame_09.jpg",
+          "target_box": [
+            1476.55,
+            692.01,
+            1522.46,
+            888.18
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 8122,
+          "url": "/media/sample-13/frame_10.jpg",
+          "target_box": [
+            1483.36,
+            691.01,
+            1529.98,
+            889.54
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 8123,
+          "url": "/media/sample-13/frame_11.jpg",
+          "target_box": [
+            1490.17,
+            690.0,
+            1537.5,
+            890.9
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 8124,
+          "url": "/media/sample-13/frame_12.jpg",
+          "target_box": [
+            1496.98,
+            689.0,
+            1545.02,
+            892.26
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 8125,
+          "url": "/media/sample-13/frame_13.jpg",
+          "target_box": [
+            1503.79,
+            688.0,
+            1552.54,
+            893.62
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 8126,
+          "url": "/media/sample-13/frame_14.jpg",
+          "target_box": [
+            1510.59,
+            687.0,
+            1560.06,
+            894.98
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 8127,
+          "url": "/media/sample-13/frame_15.jpg",
+          "target_box": [
+            1517.4,
+            685.99,
+            1567.58,
+            896.34
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-14",
+      "display_name": "Example 14",
+      "tensor_index": 13,
+      "sample_index": 320,
+      "set_id": "set03",
+      "video_id": "video_0004",
+      "pedestrian_id": "3_4_346",
+      "class_name": "Irrelevant",
+      "raw_class": -1,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 2467,
+          "url": "/media/sample-14/frame_01.jpg",
+          "target_box": [
+            957.39,
+            716.85,
+            1010.56,
+            876.93
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 2468,
+          "url": "/media/sample-14/frame_02.jpg",
+          "target_box": [
+            946.25,
+            716.44,
+            1000.35,
+            877.75
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 2469,
+          "url": "/media/sample-14/frame_03.jpg",
+          "target_box": [
+            935.1,
+            716.02,
+            990.13,
+            878.58
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 2470,
+          "url": "/media/sample-14/frame_04.jpg",
+          "target_box": [
+            923.96,
+            715.61,
+            979.92,
+            879.4
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 2471,
+          "url": "/media/sample-14/frame_05.jpg",
+          "target_box": [
+            912.81,
+            715.2,
+            969.7,
+            880.23
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 2472,
+          "url": "/media/sample-14/frame_06.jpg",
+          "target_box": [
+            899.29,
+            715.3,
+            956.18,
+            880.33
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 2473,
+          "url": "/media/sample-14/frame_07.jpg",
+          "target_box": [
+            885.77,
+            715.4,
+            942.66,
+            880.43
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 2474,
+          "url": "/media/sample-14/frame_08.jpg",
+          "target_box": [
+            872.26,
+            715.51,
+            929.15,
+            880.54
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 2475,
+          "url": "/media/sample-14/frame_09.jpg",
+          "target_box": [
+            858.74,
+            715.61,
+            915.63,
+            880.64
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 2476,
+          "url": "/media/sample-14/frame_10.jpg",
+          "target_box": [
+            845.22,
+            715.71,
+            902.11,
+            880.74
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 2477,
+          "url": "/media/sample-14/frame_11.jpg",
+          "target_box": [
+            830.24,
+            713.97,
+            888.11,
+            882.47
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 2478,
+          "url": "/media/sample-14/frame_12.jpg",
+          "target_box": [
+            815.25,
+            712.23,
+            874.11,
+            884.21
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 2479,
+          "url": "/media/sample-14/frame_13.jpg",
+          "target_box": [
+            800.27,
+            710.48,
+            860.1,
+            885.94
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 2480,
+          "url": "/media/sample-14/frame_14.jpg",
+          "target_box": [
+            785.28,
+            708.74,
+            846.1,
+            887.68
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 2481,
+          "url": "/media/sample-14/frame_15.jpg",
+          "target_box": [
+            770.3,
+            707.0,
+            832.1,
+            889.41
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-15",
+      "display_name": "Example 15",
+      "tensor_index": 14,
+      "sample_index": 357,
+      "set_id": "set03",
+      "video_id": "video_0005",
+      "pedestrian_id": "3_5_394",
+      "class_name": "Irrelevant",
+      "raw_class": -1,
+      "binary_target": 0,
+      "frames": [
+        {
+          "ordinal": 1,
+          "source_frame": 2644,
+          "url": "/media/sample-15/frame_01.jpg",
+          "target_box": [
+            1258.95,
+            701.85,
+            1303.84,
+            835.12
+          ]
+        },
+        {
+          "ordinal": 2,
+          "source_frame": 2645,
+          "url": "/media/sample-15/frame_02.jpg",
+          "target_box": [
+            1265.87,
+            701.96,
+            1310.76,
+            836.66
+          ]
+        },
+        {
+          "ordinal": 3,
+          "source_frame": 2646,
+          "url": "/media/sample-15/frame_03.jpg",
+          "target_box": [
+            1272.78,
+            702.06,
+            1317.67,
+            838.2
+          ]
+        },
+        {
+          "ordinal": 4,
+          "source_frame": 2647,
+          "url": "/media/sample-15/frame_04.jpg",
+          "target_box": [
+            1281.24,
+            700.2,
+            1327.06,
+            840.46
+          ]
+        },
+        {
+          "ordinal": 5,
+          "source_frame": 2648,
+          "url": "/media/sample-15/frame_05.jpg",
+          "target_box": [
+            1289.71,
+            698.35,
+            1336.44,
+            842.72
+          ]
+        },
+        {
+          "ordinal": 6,
+          "source_frame": 2649,
+          "url": "/media/sample-15/frame_06.jpg",
+          "target_box": [
+            1298.17,
+            696.49,
+            1345.83,
+            844.98
+          ]
+        },
+        {
+          "ordinal": 7,
+          "source_frame": 2650,
+          "url": "/media/sample-15/frame_07.jpg",
+          "target_box": [
+            1306.63,
+            694.63,
+            1355.21,
+            847.24
+          ]
+        },
+        {
+          "ordinal": 8,
+          "source_frame": 2651,
+          "url": "/media/sample-15/frame_08.jpg",
+          "target_box": [
+            1315.09,
+            692.77,
+            1364.6,
+            849.5
+          ]
+        },
+        {
+          "ordinal": 9,
+          "source_frame": 2652,
+          "url": "/media/sample-15/frame_09.jpg",
+          "target_box": [
+            1324.12,
+            692.51,
+            1375.7,
+            851.55
+          ]
+        },
+        {
+          "ordinal": 10,
+          "source_frame": 2653,
+          "url": "/media/sample-15/frame_10.jpg",
+          "target_box": [
+            1333.15,
+            692.26,
+            1386.8,
+            853.6
+          ]
+        },
+        {
+          "ordinal": 11,
+          "source_frame": 2654,
+          "url": "/media/sample-15/frame_11.jpg",
+          "target_box": [
+            1343.26,
+            689.78,
+            1399.6,
+            856.28
+          ]
+        },
+        {
+          "ordinal": 12,
+          "source_frame": 2655,
+          "url": "/media/sample-15/frame_12.jpg",
+          "target_box": [
+            1353.38,
+            687.3,
+            1412.4,
+            858.96
+          ]
+        },
+        {
+          "ordinal": 13,
+          "source_frame": 2656,
+          "url": "/media/sample-15/frame_13.jpg",
+          "target_box": [
+            1363.49,
+            684.83,
+            1425.2,
+            861.64
+          ]
+        },
+        {
+          "ordinal": 14,
+          "source_frame": 2657,
+          "url": "/media/sample-15/frame_14.jpg",
+          "target_box": [
+            1373.61,
+            682.35,
+            1438.0,
+            864.32
+          ]
+        },
+        {
+          "ordinal": 15,
+          "source_frame": 2658,
+          "url": "/media/sample-15/frame_15.jpg",
+          "target_box": [
+            1383.72,
+            679.87,
+            1450.8,
+            867.0
+          ]
+        }
+      ]
+    }
+  ]
+}
