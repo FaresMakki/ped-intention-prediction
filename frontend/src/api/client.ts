@@ -4,6 +4,7 @@ import type {
   HealthResponse,
   PackageUploadResponse,
   PredictionResponse,
+  ScenePredictionResponse,
   SampleDetail,
   SampleSummary,
 } from "../types";
@@ -25,6 +26,10 @@ export const api = {
   sample: (id: string) => request<SampleDetail>(`/api/samples/${id}`),
   predict: (id: string) =>
     request<PredictionResponse>(`/api/samples/${id}/predict`, {
+      method: "POST",
+    }),
+  predictScene: (id: string) =>
+    request<ScenePredictionResponse>(`/api/samples/${id}/predict-scene`, {
       method: "POST",
     }),
   predictAll: () =>

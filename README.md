@@ -2,8 +2,8 @@
 
 This folder is a self-contained deployment of the final locked **Trajectory +
 Social classwise fusion (Rule B)** and a separate research comparison view. It
-uses 15 prepared sequences from the PIE test split and performs live checkpoint
-inference when the user starts an analysis.
+uses 16 prepared scenes (17 annotated pedestrian tracks) from the PIE test
+split and performs live checkpoint inference when the user starts an analysis.
 
 Runtime inference never reads saved logits. Each request loads the aligned graph
 or skeleton tensors, executes the copied PyTorch checkpoints, and applies the
@@ -47,21 +47,24 @@ must not be used to choose a model.
 - `backend/app/services/` — final-model inference and comparison orchestration.
 - `backend/tests/` — API, fusion, and original-artifact parity tests.
 - `frontend/src/pages/` — independent live-fusion and comparison pages.
-- `data/` — 15 aligned model-input samples and 225 annotated frames.
+- `data/` — 16 scenes, 17 aligned pedestrian tensor bundles, and 240 frames.
 - `scripts/prepare_demo_data.py` — reproducible aligned sample exporter.
 
-The demo is balanced: five raw No Crossing, five Crossing, and five Irrelevant
-examples. Selection takes the first indexed test sample from five distinct
-videos for each raw class and never filters by prediction correctness.
+The original demo remains balanced: five raw No Crossing, five Crossing, and
+five Irrelevant examples. A sixteenth scene contains two pedestrians annotated
+over the same 15 frames. They are evaluated in one model batch, and the global
+result is Crossing whenever any pedestrian prediction is Crossing.
 
 ## Final inference path
 
 ```text
-15-frame PIE sequence
+15-frame PIE scene
         |
-        +-- trajectory graph [15, 8, 64] --> trajectory_model.pt --+
+        +-- each annotated pedestrian is stacked into one batch
+        |
+        +-- trajectory graph [N, 15, 8, 64] --> trajectory_model.pt --+
         |                                                         |
-        +-- social graph [15, 12, 80] ------> social_model.pt -----+
+        +-- social graph [N, 15, 12, 80] ------> social_model.pt -----+
                                                                   |
                                       Rule B classwise logit fusion
                                       NC: 75% trajectory + 25% social
@@ -70,7 +73,9 @@ videos for each raw class and never filters by prediction correctness.
                                                                   |
                                                  fixed binary mapping
                                                                   |
-                                                Crossing / Not Crossing
+                                      per-pedestrian Crossing / Not Crossing
+                                                                  |
+                                      global OR: any Crossing => Crossing
 ```
 
 The three class outputs use independent sigmoids, so they are not a softmax
@@ -100,9 +105,11 @@ requests to port 8000.
 ## API
 
 - `GET /api/health` — all checkpoint hashes, epochs, and service readiness.
-- `GET /api/samples` — the 15 example summaries.
+- `GET /api/samples` — the 16 example summaries.
 - `GET /api/samples/{id}` — frames and metadata for one example.
 - `POST /api/samples/{id}/predict` — live final-model inference.
+- `POST /api/samples/{id}/predict-scene` — batched inference for every
+  annotated pedestrian plus the global OR decision.
 - `POST /api/predict-all` — evaluate the final model on all prepared examples.
 - `POST /api/comparison/samples/{id}/predict` — run the five-method comparison.
 - `POST /api/uploads` — validate and register one versioned package ZIP.
@@ -113,9 +120,10 @@ requests to port 8000.
 
 Both pages accept an exact-model `.zip` package up to 25 MB. A version 1
 package contains `manifest.json`, `tensors.npz`, and exactly 15 consecutive
-JPEG or PNG frames. The tensor archive contains all model representations, so
-an uploaded sequence works in Live Fusion and Compare Models without changing
-the research inference path.
+JPEG or PNG frames for one pedestrian. The tensor archive contains all model
+representations, so an uploaded sequence works in Live Fusion and Compare
+Models without changing the research inference path. Version 1 uploads appear
+as a one-pedestrian scene in the parallel inference API.
 
 Three ready-to-upload examples are stored in `example_packages/`. Their format
 and regeneration command are documented in `example_packages/README.md`.
@@ -128,7 +136,7 @@ cd frontend
 npm run build
 ```
 
-The parity tests execute every displayed checkpoint on all 15 examples and
+The parity tests execute every displayed checkpoint on all prepared examples and
 compare deployment logits with the original research artifacts. They also check
 the final Rule B predictions and the HTTP response contracts.
 

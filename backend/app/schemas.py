@@ -29,8 +29,15 @@ class SampleSummary(ApiModel):
     class_name: str
     raw_class: int
     binary_target: int
+    pedestrian_count: int
     poster_url: str
     source: str
+
+
+class PedestrianFrameBox(ApiModel):
+    pedestrian_id: str
+    box: list[float] | None
+    color: str
 
 
 class FrameInfo(ApiModel):
@@ -38,6 +45,17 @@ class FrameInfo(ApiModel):
     source_frame: int
     url: str
     target_box: list[float] | None
+    pedestrian_boxes: list[PedestrianFrameBox]
+
+
+class PedestrianInfo(ApiModel):
+    tensor_index: int
+    sample_index: int
+    pedestrian_id: str
+    class_name: str
+    raw_class: int
+    binary_target: int
+    color: str
 
 
 class SampleDetail(ApiModel):
@@ -51,6 +69,8 @@ class SampleDetail(ApiModel):
     class_name: str
     raw_class: int
     binary_target: int
+    pedestrian_count: int
+    pedestrians: list[PedestrianInfo]
     frames: list[FrameInfo]
     source: str
 
@@ -63,11 +83,20 @@ class PackageUploadResponse(ApiModel):
 class PredictionResponse(ApiModel):
     sample_id: str
     sample_index: int
+    pedestrian_id: str
     ground_truth: dict[str, Any]
     trajectory: dict[str, Any]
     social: dict[str, Any]
     fusion: dict[str, Any]
     is_correct: bool
+    latency_ms: float
+
+
+class ScenePredictionResponse(ApiModel):
+    sample_id: str
+    pedestrian_count: int
+    predictions: list[PredictionResponse]
+    global_decision: dict[str, Any]
     latency_ms: float
 
 

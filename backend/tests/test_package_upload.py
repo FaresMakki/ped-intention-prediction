@@ -30,6 +30,7 @@ def test_example_packages_upload_and_reproduce_prepared_inference() -> None:
             uploaded_ids[prepared_id] = sample["id"]
             assert sample["source"] == "upload"
             assert payload["summary"]["source"] == "upload"
+            assert sample["pedestrian_count"] == 1
             assert len(sample["frames"]) == 15
 
             frame = client.get(sample["frames"][7]["url"])
@@ -44,8 +45,16 @@ def test_example_packages_upload_and_reproduce_prepared_inference() -> None:
             assert uploaded["social"]["logits"] == prepared["social"]["logits"]
             assert uploaded["fusion"] == prepared["fusion"]
 
+            scene = client.post(
+                f"/api/samples/{sample['id']}/predict-scene"
+            ).json()
+            assert scene["pedestrian_count"] == 1
+            assert scene["global_decision"]["binary_prediction"] == uploaded[
+                "fusion"
+            ]["binary_prediction"]
+
         samples = client.get("/api/samples").json()
-        assert len(samples) == 18
+        assert len(samples) == 19
         assert all(sample["source"] == "upload" for sample in samples[:3])
 
         uploaded_comparison = client.post(
@@ -67,4 +76,4 @@ def test_invalid_package_is_rejected_without_registration() -> None:
         )
         assert response.status_code == 400
         assert "valid ZIP" in response.json()["detail"]
-        assert len(client.get("/api/samples").json()) == 15
+        assert len(client.get("/api/samples").json()) == 16

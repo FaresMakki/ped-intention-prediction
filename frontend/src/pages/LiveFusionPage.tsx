@@ -10,7 +10,7 @@ import type {
   BatchPredictionResponse,
   FilterName,
   HealthResponse,
-  PredictionResponse,
+  ScenePredictionResponse,
   SampleDetail,
   SampleSummary,
 } from "../types";
@@ -20,7 +20,10 @@ export function LiveFusionPage() {
   const [samples, setSamples] = useState<SampleSummary[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [sample, setSample] = useState<SampleDetail | null>(null);
-  const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
+  const [prediction, setPrediction] = useState<ScenePredictionResponse | null>(
+    null,
+  );
+  const [focusedPedestrianId, setFocusedPedestrianId] = useState("");
   const [filter, setFilter] = useState<FilterName>("All");
   const [loadingSample, setLoadingSample] = useState(false);
   const [predicting, setPredicting] = useState(false);
@@ -43,6 +46,7 @@ export function LiveFusionPage() {
     if (!selectedId) return;
     setLoadingSample(true);
     setPrediction(null);
+    setFocusedPedestrianId("");
     api
       .sample(selectedId)
       .then(setSample)
@@ -54,13 +58,19 @@ export function LiveFusionPage() {
     () => samples.find((item) => item.id === selectedId),
     [samples, selectedId],
   );
+  const focusedPrediction =
+    prediction?.predictions.find(
+      (item) => item.pedestrian_id === focusedPedestrianId,
+    ) ?? prediction?.predictions[0];
 
   async function runPrediction() {
     if (!selectedId) return;
     setPredicting(true);
     setError("");
     try {
-      setPrediction(await api.predict(selectedId));
+      const result = await api.predictScene(selectedId);
+      setPrediction(result);
+      setFocusedPedestrianId(result.predictions[0]?.pedestrian_id ?? "");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Prediction failed");
     } finally {
@@ -123,7 +133,7 @@ export function LiveFusionPage() {
               onClick={runAll}
               type="button"
             >
-              {batching ? "Running 15…" : "Evaluate all 15"}
+              {batching ? "Running demo set…" : "Evaluate demo set"}
             </button>
             <StatusDot
               label={health ? "2 source models online" : "Connecting"}
@@ -161,6 +171,8 @@ export function LiveFusionPage() {
               prediction={prediction}
               predicting={predicting}
               sample={sample}
+              focusedPedestrianId={focusedPrediction?.pedestrian_id ?? ""}
+              onFocusPedestrian={setFocusedPedestrianId}
             />
           </div>
 
@@ -178,8 +190,8 @@ export function LiveFusionPage() {
             <div className="model-grid">
               <ModelCard
                 index="01"
-                output={prediction?.trajectory}
-                subtitle="15 × 8 relation-risk graph"
+                output={focusedPrediction?.trajectory}
+                subtitle="15 × 8 trajectory-context graph"
                 title="Trajectory context"
               />
               <div className="fusion-connector" aria-hidden="true">
@@ -187,7 +199,7 @@ export function LiveFusionPage() {
               </div>
               <ModelCard
                 index="02"
-                output={prediction?.social}
+                output={focusedPrediction?.social}
                 subtitle="15 × 12 interaction graph"
                 title="Social interaction"
               />
@@ -199,7 +211,9 @@ export function LiveFusionPage() {
             <strong>
               {selectedSummary
                 ? `${selectedSummary.set_id} / ${selectedSummary.video_id} / ` +
-                  selectedSummary.pedestrian_id
+                  (selectedSummary.pedestrian_count > 1
+                    ? `${selectedSummary.pedestrian_count} pedestrians`
+                    : selectedSummary.pedestrian_id)
                 : "Loading…"}
             </strong>
             <span className="footer-divider" />

@@ -7,6 +7,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Any
 
+import numpy as np
 import torch
 
 from app.ml.checkpoint_loader import load_checkpoint, sha256, to_tensor
@@ -79,6 +80,63 @@ class InferenceService:
         result["latency_ms"] = round((time.perf_counter() - started) * 1000, 2)
         return result
 
+    def predict_scene(self, sample_id: str) -> dict[str, Any]:
+        """Predict all annotated pedestrians together and aggregate scene risk."""
+        started = time.perf_counter()
+        members = self.repository.get_scene_members(sample_id)
+        with self._lock, torch.inference_mode():
+            trajectory_logits, social_logits = self._run_models_batch(
+                [tensors for _metadata, tensors in members]
+            )
+            predictions = [
+                self._format_prediction(
+                    metadata,
+                    trajectory_logits[index : index + 1],
+                    social_logits[index : index + 1],
+                )
+                for index, (metadata, _tensors) in enumerate(members)
+            ]
+
+        latency_ms = round((time.perf_counter() - started) * 1000, 2)
+        for prediction in predictions:
+            prediction["latency_ms"] = latency_ms
+
+        crossing_ids = [
+            prediction["pedestrian_id"]
+            for prediction in predictions
+            if prediction["fusion"]["binary_prediction"]
+        ]
+        not_crossing_ids = [
+            prediction["pedestrian_id"]
+            for prediction in predictions
+            if not prediction["fusion"]["binary_prediction"]
+        ]
+        binary_prediction = int(bool(crossing_ids))
+        binary_target = int(
+            any(prediction["ground_truth"]["binary_target"] for prediction in predictions)
+        )
+        return {
+            "sample_id": sample_id,
+            "pedestrian_count": len(predictions),
+            "predictions": predictions,
+            "global_decision": {
+                "binary_prediction": binary_prediction,
+                "binary_label": "Crossing" if binary_prediction else "Not Crossing",
+                "binary_score": max(
+                    prediction["fusion"]["binary_score"] for prediction in predictions
+                ),
+                "threshold": 0.5,
+                "crossing_pedestrian_ids": crossing_ids,
+                "not_crossing_pedestrian_ids": not_crossing_ids,
+                "ground_truth_binary_target": binary_target,
+                "ground_truth_binary_label": (
+                    "Crossing" if binary_target else "Not Crossing"
+                ),
+                "is_correct": binary_prediction == binary_target,
+            },
+            "latency_ms": latency_ms,
+        }
+
     def predict_all(self) -> dict[str, Any]:
         started = time.perf_counter()
         predictions = [
@@ -110,6 +168,31 @@ class InferenceService:
         )
         return trajectory_logits.cpu(), social_logits.cpu()
 
+    def _run_models_batch(
+        self,
+        tensors: list[SampleTensors],
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Use the model batch dimension for parallel pedestrian inference."""
+
+        def batch(name: str) -> torch.Tensor:
+            values = np.stack([getattr(item, name) for item in tensors]).astype(
+                np.float32,
+                copy=False,
+            )
+            return torch.from_numpy(values).to(self.device)
+
+        trajectory_logits = self.trajectory_model(
+            batch("trajectory_nodes"),
+            batch("trajectory_adjacency"),
+            batch("trajectory_mask"),
+        )
+        social_logits = self.social_model(
+            batch("social_nodes"),
+            batch("social_adjacency"),
+            batch("social_mask"),
+        )
+        return trajectory_logits.cpu(), social_logits.cpu()
+
     def _format_prediction(
         self,
         metadata: dict[str, Any],
@@ -128,6 +211,7 @@ class InferenceService:
         return {
             "sample_id": metadata["id"],
             "sample_index": metadata["sample_index"],
+            "pedestrian_id": metadata["pedestrian_id"],
             "ground_truth": {
                 "raw_class": metadata["raw_class"],
                 "class_name": metadata["class_name"],

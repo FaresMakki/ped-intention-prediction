@@ -45,7 +45,12 @@ export function SequenceViewer({ sample, loading }: SequenceViewerProps) {
               <span>{String(frame.ordinal).padStart(2, "0")}</span> / 15
             </div>
             <div className="target-legend">
-              <span /> Target pedestrian {sample?.pedestrian_id}
+              {sample?.pedestrians.map((pedestrian, index) => (
+                <span className="target-person" key={pedestrian.pedestrian_id}>
+                  <i style={{ background: pedestrian.color }} />P{index + 1}{" "}
+                  {pedestrian.pedestrian_id}
+                </span>
+              ))}
             </div>
           </>
         )}

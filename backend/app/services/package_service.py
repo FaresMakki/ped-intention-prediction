@@ -7,6 +7,7 @@ import json
 import math
 import zipfile
 from dataclasses import dataclass
+from itertools import pairwise
 from pathlib import PurePosixPath
 from typing import Literal
 
@@ -163,7 +164,7 @@ def _load_manifest(archive: zipfile.ZipFile, members: dict[str, zipfile.ZipInfo]
         raise PackageValidationError("Frame ordinals must be exactly 1 through 15.")
     if len(set(frame_files)) != FRAME_COUNT:
         raise PackageValidationError("Every frame must reference a unique image file.")
-    if any(right != left + 1 for left, right in zip(source_frames, source_frames[1:])):
+    if any(right != left + 1 for left, right in pairwise(source_frames)):
         raise PackageValidationError("Source frames must be 15 consecutive frame IDs.")
     if manifest.class_name != CLASS_BY_RAW[manifest.raw_class]:
         raise PackageValidationError("class_name does not match raw_class.")

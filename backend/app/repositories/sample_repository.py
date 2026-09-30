@@ -1,4 +1,4 @@
-"""Validated access to the 15 prepared PIE graph sequences."""
+"""Validated access to prepared PIE scenes and pedestrian tensors."""
 
 from __future__ import annotations
 
@@ -62,16 +62,25 @@ class SampleRepository:
         self._manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self._samples: list[dict[str, Any]] = self._manifest["samples"]
         self._by_id = {sample["id"]: sample for sample in self._samples}
-        if len(self._samples) != 15 or len(self._by_id) != len(self._samples):
-            raise ValueError("The deployment manifest must contain 15 unique samples.")
+        if not self._samples or len(self._by_id) != len(self._samples):
+            raise ValueError("The deployment manifest must contain unique samples.")
 
         archive = np.load(tensors_path, allow_pickle=False)
         missing = set(self.REQUIRED_ARRAYS) - set(archive.files)
         if missing:
             raise ValueError(f"Prepared tensor archive is missing: {sorted(missing)}")
         self._arrays = {name: archive[name] for name in self.REQUIRED_ARRAYS}
-        if any(array.shape[0] != len(self._samples) for array in self._arrays.values()):
-            raise ValueError("Prepared arrays do not match the manifest sample count.")
+        tensor_counts = {array.shape[0] for array in self._arrays.values()}
+        if len(tensor_counts) != 1:
+            raise ValueError("Prepared arrays do not share one tensor count.")
+        tensor_count = tensor_counts.pop()
+        for sample in self._samples:
+            for pedestrian in self._pedestrians(sample):
+                index = int(pedestrian["tensor_index"])
+                if not 0 <= index < tensor_count:
+                    raise ValueError(
+                        f"Pedestrian tensor index {index} is outside the archive."
+                    )
         self._uploaded_metadata: dict[str, dict[str, Any]] = {}
         self._uploaded_tensors: dict[str, SampleTensors] = {}
         self._uploaded_frames: dict[str, dict[int, UploadedFrame]] = {}
@@ -112,7 +121,30 @@ class SampleRepository:
         if uploaded is not None:
             return uploaded
         metadata = self.get_metadata(sample_id)
-        index = int(metadata["tensor_index"])
+        return self._tensors_at(int(metadata["tensor_index"]))
+
+    def get_scene_members(
+        self, sample_id: str
+    ) -> list[tuple[dict[str, Any], SampleTensors]]:
+        """Return every annotated pedestrian and tensor bundle for one scene."""
+        metadata = self.get_metadata(sample_id)
+        if metadata["source"] == "upload":
+            return [(metadata, self.get_tensors(sample_id))]
+
+        members: list[tuple[dict[str, Any], SampleTensors]] = []
+        for pedestrian in self._pedestrians(metadata):
+            person_metadata = {
+                **metadata,
+                **pedestrian,
+                "id": sample_id,
+                "source": "prepared",
+            }
+            members.append(
+                (person_metadata, self._tensors_at(int(pedestrian["tensor_index"])))
+            )
+        return members
+
+    def _tensors_at(self, index: int) -> SampleTensors:
         return SampleTensors(
             trajectory_nodes=self._arrays["trajectory_nodes"][index],
             trajectory_adjacency=self._arrays["trajectory_adjacency"][index],
@@ -139,9 +171,25 @@ class SampleRepository:
     ) -> dict[str, Any]:
         """Register one validated package and return its public metadata."""
         sample_id = f"upload-{uuid4().hex[:12]}"
+        pedestrian = {
+            "tensor_index": -1,
+            "sample_index": metadata["sample_index"],
+            "pedestrian_id": metadata["pedestrian_id"],
+            "class_name": metadata["class_name"],
+            "raw_class": metadata["raw_class"],
+            "binary_target": metadata["binary_target"],
+            "color": "#B1EF68",
+        }
         public_frames = [
             {
                 **frame,
+                "pedestrian_boxes": [
+                    {
+                        "pedestrian_id": metadata["pedestrian_id"],
+                        "box": frame["target_box"],
+                        "color": pedestrian["color"],
+                    }
+                ],
                 "url": f"/api/uploads/{sample_id}/frames/{frame['ordinal']}",
             }
             for frame in metadata["frames"]
@@ -151,6 +199,8 @@ class SampleRepository:
             "id": sample_id,
             "tensor_index": -1,
             "source": "upload",
+            "pedestrian_count": 1,
+            "pedestrians": [pedestrian],
             "frames": public_frames,
         }
         with self._lock:
@@ -169,6 +219,23 @@ class SampleRepository:
                 ) from error
 
     @staticmethod
+    def _pedestrians(sample: dict[str, Any]) -> list[dict[str, Any]]:
+        pedestrians = sample.get("pedestrians")
+        if pedestrians:
+            return list(pedestrians)
+        return [
+            {
+                "tensor_index": sample["tensor_index"],
+                "sample_index": sample["sample_index"],
+                "pedestrian_id": sample["pedestrian_id"],
+                "class_name": sample["class_name"],
+                "raw_class": sample["raw_class"],
+                "binary_target": sample["binary_target"],
+                "color": "#B1EF68",
+            }
+        ]
+
+    @staticmethod
     def _summary(sample: dict[str, Any]) -> dict[str, Any]:
         return {
             "id": sample["id"],
@@ -180,6 +247,7 @@ class SampleRepository:
             "class_name": sample["class_name"],
             "raw_class": sample["raw_class"],
             "binary_target": sample["binary_target"],
+            "pedestrian_count": len(SampleRepository._pedestrians(sample)),
             "poster_url": sample["frames"][7]["url"],
             "source": sample.get("source", "prepared"),
         }

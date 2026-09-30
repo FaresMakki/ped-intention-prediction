@@ -23,8 +23,15 @@ export interface SampleSummary {
   class_name: ClassName;
   raw_class: number;
   binary_target: number;
+  pedestrian_count: number;
   poster_url: string;
   source: "prepared" | "upload";
+}
+
+export interface PedestrianFrameBox {
+  pedestrian_id: string;
+  box: number[] | null;
+  color: string;
 }
 
 export interface FrameInfo {
@@ -32,10 +39,22 @@ export interface FrameInfo {
   source_frame: number;
   url: string;
   target_box: number[] | null;
+  pedestrian_boxes: PedestrianFrameBox[];
+}
+
+export interface PedestrianInfo {
+  tensor_index: number;
+  sample_index: number;
+  pedestrian_id: string;
+  class_name: ClassName;
+  raw_class: number;
+  binary_target: number;
+  color: string;
 }
 
 export interface SampleDetail extends Omit<SampleSummary, "poster_url"> {
   tensor_index: number;
+  pedestrians: PedestrianInfo[];
   frames: FrameInfo[];
 }
 
@@ -70,6 +89,7 @@ export interface FusionOutput {
 export interface PredictionResponse {
   sample_id: string;
   sample_index: number;
+  pedestrian_id: string;
   ground_truth: {
     raw_class: number;
     class_name: ClassName;
@@ -80,6 +100,24 @@ export interface PredictionResponse {
   social: SourceOutput;
   fusion: FusionOutput;
   is_correct: boolean;
+  latency_ms: number;
+}
+
+export interface ScenePredictionResponse {
+  sample_id: string;
+  pedestrian_count: number;
+  predictions: PredictionResponse[];
+  global_decision: {
+    binary_prediction: number;
+    binary_label: "Crossing" | "Not Crossing";
+    binary_score: number;
+    threshold: number;
+    crossing_pedestrian_ids: string[];
+    not_crossing_pedestrian_ids: string[];
+    ground_truth_binary_target: number;
+    ground_truth_binary_label: "Crossing" | "Not Crossing";
+    is_correct: boolean;
+  };
   latency_ms: number;
 }
 

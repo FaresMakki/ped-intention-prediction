@@ -12,6 +12,7 @@ from app.schemas import (
     PredictionResponse,
     SampleDetail,
     SampleSummary,
+    ScenePredictionResponse,
 )
 from app.services.comparison_service import ComparisonService
 from app.services.inference_service import InferenceService
@@ -111,6 +112,18 @@ def sample_detail(sample_id: str, request: Request) -> dict:
 def predict(sample_id: str, request: Request) -> dict:
     try:
         return _service(request).predict(sample_id)
+    except KeyError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+
+
+@router.post(
+    "/samples/{sample_id}/predict-scene",
+    response_model=ScenePredictionResponse,
+)
+def predict_scene(sample_id: str, request: Request) -> dict:
+    """Run one batched forward pass for every annotated pedestrian."""
+    try:
+        return _service(request).predict_scene(sample_id)
     except KeyError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
 

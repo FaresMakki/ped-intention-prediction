@@ -501,13 +501,20 @@ h2 {
   padding: 7px 9px;
   color: #d3e6db;
   font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
 }
-.target-legend span {
+.target-person {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.target-person i {
   display: inline-block;
   width: 7px;
   height: 7px;
   margin-right: 6px;
-  background: var(--green);
 }
 .playback-controls {
   min-height: 53px;
@@ -660,6 +667,72 @@ h2 {
 }
 .truth-row strong {
   color: var(--text);
+}
+.scene-truth-row {
+  margin-bottom: 10px;
+}
+.person-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-bottom: 13px;
+}
+.person-result {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--line-soft);
+  background: #0d1411;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.person-result:hover,
+.person-result.active {
+  border-color: #47725d;
+  background: #101d17;
+}
+.person-result-id {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: var(--muted);
+  font:
+    8px/1.2 ui-monospace,
+    monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.person-result-id i {
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  flex: 0 0 auto;
+}
+.person-result strong,
+.person-result small {
+  display: block;
+}
+.person-result strong {
+  margin-top: 7px;
+  font-size: 12px;
+}
+.person-result small {
+  margin-top: 3px;
+  color: #779084;
+  font-size: 8px;
+}
+.focused-person-heading {
+  margin: 3px 0 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 9px;
+}
+.focused-person-heading strong {
+  color: var(--text);
+  font-family: ui-monospace, monospace;
 }
 .correct {
   color: var(--green);

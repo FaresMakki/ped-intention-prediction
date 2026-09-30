@@ -68,8 +68,10 @@ export function SampleLibrary({
             <span className="sample-card-copy">
               <span className="sample-name">{sample.display_name}</span>
               <span className="sample-source">
-                {sample.video_id.replace("video_", "Video ")} · Ped{" "}
-                {sample.pedestrian_id}
+                {sample.video_id.replace("video_", "Video ")} ·{" "}
+                {sample.pedestrian_count > 1
+                  ? `${sample.pedestrian_count} pedestrians`
+                  : `Ped ${sample.pedestrian_id}`}
               </span>
               <span className={`class-pill ${classToken(sample.class_name)}`}>
                 {sample.class_name}
