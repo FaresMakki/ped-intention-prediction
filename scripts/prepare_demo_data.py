@@ -19,8 +19,9 @@ DATA_ROOT = DEPLOYMENT_ROOT / "data"
 FRAME_ROOT = DATA_ROOT / "frames"
 CLASS_NAMES = {0: "No Crossing", 1: "Crossing", -1: "Irrelevant"}
 CLASS_ORDER = (0, 1, -1)
-SAMPLES_PER_CLASS = 5
-PARALLEL_SAMPLE_INDICES = (496, 497)
+SCENES_PER_CLASS = {0: 6, 1: 5, -1: 4}
+MIN_PEDESTRIANS = 2
+MAX_PEDESTRIANS = 4
 PEDESTRIAN_COLORS = ("#B1EF68", "#67B7FF", "#F7B955", "#E788FF")
 
 
@@ -29,44 +30,66 @@ def read_index(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
-def select_samples(rows: list[dict[str, str]]) -> list[dict[str, str]]:
-    """Take the first test sample from five distinct videos per raw class."""
-    test_rows = [row for row in rows if row["split"] == "test"]
-    selected: list[dict[str, str]] = []
+def scene_class(rows: list[dict[str, str]]) -> int:
+    """Aggregate pedestrian labels with the same safety-first scene rule."""
+    raw_classes = {int(row["raw_crossing"]) for row in rows}
+    if 1 in raw_classes:
+        return 1
+    if 0 in raw_classes:
+        return 0
+    return -1
+
+
+def select_scenes(rows: list[dict[str, str]]) -> list[list[dict[str, str]]]:
+    """Select 15 exact-window test scenes containing 2--4 pedestrians each."""
+    grouped: dict[tuple[str, str, str], list[dict[str, str]]] = defaultdict(list)
+    for row in rows:
+        if row["split"] != "test":
+            continue
+        if row["target_ped_found_all_15_frames"] not in {"1", "True", "true"}:
+            continue
+        grouped[(row["set_id"], row["video_id"], row["frames"])].append(row)
+
+    candidates = [
+        group
+        for group in grouped.values()
+        if MIN_PEDESTRIANS <= len(group) <= MAX_PEDESTRIANS
+    ]
+    candidates.sort(
+        key=lambda group: (
+            group[0]["set_id"],
+            group[0]["video_id"],
+            json.loads(group[0]["frames"])[0],
+        )
+    )
+
+    selected: list[list[dict[str, str]]] = []
     for raw_class in CLASS_ORDER:
-        class_rows = [row for row in test_rows if int(row["raw_crossing"]) == raw_class]
+        eligible = [group for group in candidates if scene_class(group) == raw_class]
+        target_count = SCENES_PER_CLASS[raw_class]
+        chosen: list[list[dict[str, str]]] = []
         used_videos: set[str] = set()
-        chosen: list[dict[str, str]] = []
-        for row in class_rows:
-            if row["video_id"] in used_videos:
+
+        for group in eligible:
+            video_id = group[0]["video_id"]
+            if video_id in used_videos:
                 continue
-            chosen.append(row)
-            used_videos.add(row["video_id"])
-            if len(chosen) == SAMPLES_PER_CLASS:
+            chosen.append(group)
+            used_videos.add(video_id)
+            if len(chosen) == target_count:
                 break
-        if len(chosen) != SAMPLES_PER_CLASS:
-            raise RuntimeError(f"Not enough distinct videos for raw class {raw_class}.")
+        if len(chosen) < target_count:
+            for group in eligible:
+                if group in chosen:
+                    continue
+                chosen.append(group)
+                if len(chosen) == target_count:
+                    break
+        if len(chosen) != target_count:
+            raise RuntimeError(
+                f"Not enough multi-pedestrian scenes for raw class {raw_class}."
+            )
         selected.extend(chosen)
-    return selected
-
-
-def select_parallel_scene(rows: list[dict[str, str]]) -> list[dict[str, str]]:
-    """Select one exact two-pedestrian window with different model decisions."""
-    by_index = {int(row["sample_index"]): row for row in rows}
-    selected = [by_index[index] for index in PARALLEL_SAMPLE_INDICES]
-    scene_keys = {
-        (row["set_id"], row["video_id"], row["frames"], row["split"])
-        for row in selected
-    }
-    if len(scene_keys) != 1 or selected[0]["split"] != "test":
-        raise RuntimeError("Parallel pedestrians must share one exact test window.")
-    if len({row["ped_id"] for row in selected}) != len(selected):
-        raise RuntimeError("Parallel scene pedestrian IDs must be unique.")
-    if any(
-        row["target_ped_found_all_15_frames"] not in {"1", "True", "true"}
-        for row in selected
-    ):
-        raise RuntimeError("Parallel pedestrians must be annotated in all 15 frames.")
     return selected
 
 
@@ -271,12 +294,9 @@ def main() -> None:
             for source, candidate in zip(trajectory_rows, rows, strict=True)
         ):
             raise RuntimeError(f"{name} samples are not aligned to the source index.")
-    selected = select_samples(trajectory_rows)
-    parallel_scene = select_parallel_scene(trajectory_rows)
-    tensor_rows = [*selected, *parallel_scene]
-    selected_indices = np.array(
-        [int(row["sample_index"]) for row in tensor_rows]
-    )
+    selected_scenes = select_scenes(trajectory_rows)
+    tensor_rows = [row for scene in selected_scenes for row in scene]
+    selected_indices = np.array([int(row["sample_index"]) for row in tensor_rows])
 
     arrays = {
         "trajectory_nodes": np.load(
@@ -326,8 +346,7 @@ def main() -> None:
     requests_by_video: dict[tuple[str, str], dict[str, set[int]]] = defaultdict(
         lambda: defaultdict(set)
     )
-    scene_rows = [[row] for row in selected] + [parallel_scene]
-    for rows in scene_rows:
+    for rows in selected_scenes:
         for row in rows:
             requests_by_video[(row["set_id"], row["video_id"])][
                 row["ped_id"]
@@ -350,85 +369,48 @@ def main() -> None:
         shutil.rmtree(resolved_frame_root)
     FRAME_ROOT.mkdir(parents=True)
     samples = []
-    for tensor_index, row in enumerate(selected):
-        sample_id = f"sample-{tensor_index + 1:02d}"
-        raw_class = int(row["raw_crossing"])
+    tensor_cursor = 0
+    for scene_index, rows in enumerate(selected_scenes, start=1):
+        sample_id = f"sample-{scene_index:02d}"
+        primary = rows[0]
+        raw_class = scene_class(rows)
         frame_info = export_frames(
-            [row],
+            rows,
             sample_id,
-            boxes_by_video[(row["set_id"], row["video_id"])],
+            boxes_by_video[(primary["set_id"], primary["video_id"])],
         )
-        pedestrian = {
-            "tensor_index": tensor_index,
-            "sample_index": int(row["sample_index"]),
-            "pedestrian_id": row["ped_id"],
-            "class_name": CLASS_NAMES[raw_class],
-            "raw_class": raw_class,
-            "binary_target": int(row["binary_crossing"]),
-            "color": PEDESTRIAN_COLORS[0],
-        }
+        pedestrians = []
+        for offset, row in enumerate(rows):
+            pedestrian_raw_class = int(row["raw_crossing"])
+            pedestrians.append(
+                {
+                    "tensor_index": tensor_cursor + offset,
+                    "sample_index": int(row["sample_index"]),
+                    "pedestrian_id": row["ped_id"],
+                    "class_name": CLASS_NAMES[pedestrian_raw_class],
+                    "raw_class": pedestrian_raw_class,
+                    "binary_target": int(row["binary_crossing"]),
+                    "color": PEDESTRIAN_COLORS[offset],
+                }
+            )
         samples.append(
             {
                 "id": sample_id,
-                "display_name": f"Example {tensor_index + 1:02d}",
-                "tensor_index": tensor_index,
-                "sample_index": int(row["sample_index"]),
-                "set_id": row["set_id"],
-                "video_id": row["video_id"],
-                "pedestrian_id": row["ped_id"],
+                "display_name": f"Multi-ped Scene {scene_index:02d}",
+                "tensor_index": tensor_cursor,
+                "sample_index": int(primary["sample_index"]),
+                "set_id": primary["set_id"],
+                "video_id": primary["video_id"],
+                "pedestrian_id": primary["ped_id"],
                 "class_name": CLASS_NAMES[raw_class],
                 "raw_class": raw_class,
-                "binary_target": int(row["binary_crossing"]),
-                "pedestrian_count": 1,
-                "pedestrians": [pedestrian],
+                "binary_target": int(raw_class == 1),
+                "pedestrian_count": len(pedestrians),
+                "pedestrians": pedestrians,
                 "frames": frame_info,
             }
         )
-
-    parallel_sample_id = f"sample-{len(samples) + 1:02d}"
-    parallel_start = len(selected)
-    parallel_pedestrians = []
-    for offset, row in enumerate(parallel_scene):
-        raw_class = int(row["raw_crossing"])
-        parallel_pedestrians.append(
-            {
-                "tensor_index": parallel_start + offset,
-                "sample_index": int(row["sample_index"]),
-                "pedestrian_id": row["ped_id"],
-                "class_name": CLASS_NAMES[raw_class],
-                "raw_class": raw_class,
-                "binary_target": int(row["binary_crossing"]),
-                "color": PEDESTRIAN_COLORS[offset],
-            }
-        )
-    parallel_binary_target = int(
-        any(person["binary_target"] for person in parallel_pedestrians)
-    )
-    parallel_raw_class = 1 if parallel_binary_target else 0
-    parallel_frames = export_frames(
-        parallel_scene,
-        parallel_sample_id,
-        boxes_by_video[
-            (parallel_scene[0]["set_id"], parallel_scene[0]["video_id"])
-        ],
-    )
-    samples.append(
-        {
-            "id": parallel_sample_id,
-            "display_name": "Parallel Scene",
-            "tensor_index": parallel_start,
-            "sample_index": int(parallel_scene[0]["sample_index"]),
-            "set_id": parallel_scene[0]["set_id"],
-            "video_id": parallel_scene[0]["video_id"],
-            "pedestrian_id": parallel_scene[0]["ped_id"],
-            "class_name": CLASS_NAMES[parallel_raw_class],
-            "raw_class": parallel_raw_class,
-            "binary_target": parallel_binary_target,
-            "pedestrian_count": len(parallel_pedestrians),
-            "pedestrians": parallel_pedestrians,
-            "frames": parallel_frames,
-        }
-    )
+        tensor_cursor += len(rows)
 
     DATA_ROOT.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
@@ -436,25 +418,22 @@ def main() -> None:
         **{name: array[selected_indices] for name, array in arrays.items()},
     )
     manifest = {
-        "version": 3,
+        "version": 4,
         "frame_count": 15,
         "selection": {
             "split": "test",
             "method": (
-                "Base 15: first indexed sample from five distinct videos per "
-                "raw class, with no correctness filtering. One additional fixed "
-                "two-pedestrian window demonstrates parallel scene inference."
+                "Fifteen exact-window test scenes with 2--4 fully annotated "
+                "pedestrians; distinct videos are preferred and prediction "
+                "correctness is never used for selection."
             ),
-            "class_balance": {name: SAMPLES_PER_CLASS for name in CLASS_NAMES.values()},
-            "parallel_scene": {
-                "sample_id": parallel_sample_id,
-                "pedestrian_count": len(parallel_pedestrians),
-                "aggregation": "Crossing when any pedestrian predicts Crossing",
-                "selection_reason": (
-                    "Both pedestrians are annotated for the same 15 frames and "
-                    "produce different locked-fusion decisions."
-                ),
+            "class_balance": {
+                CLASS_NAMES[raw_class]: count
+                for raw_class, count in SCENES_PER_CLASS.items()
             },
+            "pedestrian_count": len(tensor_rows),
+            "pedestrians_per_scene": [len(scene) for scene in selected_scenes],
+            "aggregation": "Crossing when any pedestrian predicts Crossing",
         },
         "samples": samples,
     }

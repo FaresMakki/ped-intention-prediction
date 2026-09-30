@@ -82,7 +82,7 @@ class SampleRepository:
                         f"Pedestrian tensor index {index} is outside the archive."
                     )
         self._uploaded_metadata: dict[str, dict[str, Any]] = {}
-        self._uploaded_tensors: dict[str, SampleTensors] = {}
+        self._uploaded_tensors: dict[str, list[SampleTensors]] = {}
         self._uploaded_frames: dict[str, dict[int, UploadedFrame]] = {}
         self._lock = RLock()
 
@@ -119,7 +119,7 @@ class SampleRepository:
         with self._lock:
             uploaded = self._uploaded_tensors.get(sample_id)
         if uploaded is not None:
-            return uploaded
+            return uploaded[0]
         metadata = self.get_metadata(sample_id)
         return self._tensors_at(int(metadata["tensor_index"]))
 
@@ -129,7 +129,27 @@ class SampleRepository:
         """Return every annotated pedestrian and tensor bundle for one scene."""
         metadata = self.get_metadata(sample_id)
         if metadata["source"] == "upload":
-            return [(metadata, self.get_tensors(sample_id))]
+            with self._lock:
+                uploaded_tensors = self._uploaded_tensors[sample_id]
+            pedestrians = self._pedestrians(metadata)
+            if len(pedestrians) != len(uploaded_tensors):
+                raise ValueError("Uploaded pedestrian metadata and tensors are misaligned.")
+            return [
+                (
+                    {
+                        **metadata,
+                        **pedestrian,
+                        "id": sample_id,
+                        "source": "upload",
+                    },
+                    tensors,
+                )
+                for pedestrian, tensors in zip(
+                    pedestrians,
+                    uploaded_tensors,
+                    strict=True,
+                )
+            ]
 
         members: list[tuple[dict[str, Any], SampleTensors]] = []
         for pedestrian in self._pedestrians(metadata):
@@ -166,30 +186,17 @@ class SampleRepository:
     def add_uploaded_sample(
         self,
         metadata: dict[str, Any],
-        tensors: SampleTensors,
+        tensors: list[SampleTensors],
         frames: dict[int, UploadedFrame],
     ) -> dict[str, Any]:
-        """Register one validated package and return its public metadata."""
+        """Register one validated single- or multi-pedestrian package."""
+        pedestrians = self._pedestrians(metadata)
+        if not tensors or len(pedestrians) != len(tensors):
+            raise ValueError("Every uploaded pedestrian must have one tensor bundle.")
         sample_id = f"upload-{uuid4().hex[:12]}"
-        pedestrian = {
-            "tensor_index": -1,
-            "sample_index": metadata["sample_index"],
-            "pedestrian_id": metadata["pedestrian_id"],
-            "class_name": metadata["class_name"],
-            "raw_class": metadata["raw_class"],
-            "binary_target": metadata["binary_target"],
-            "color": "#B1EF68",
-        }
         public_frames = [
             {
                 **frame,
-                "pedestrian_boxes": [
-                    {
-                        "pedestrian_id": metadata["pedestrian_id"],
-                        "box": frame["target_box"],
-                        "color": pedestrian["color"],
-                    }
-                ],
                 "url": f"/api/uploads/{sample_id}/frames/{frame['ordinal']}",
             }
             for frame in metadata["frames"]
@@ -199,13 +206,13 @@ class SampleRepository:
             "id": sample_id,
             "tensor_index": -1,
             "source": "upload",
-            "pedestrian_count": 1,
-            "pedestrians": [pedestrian],
+            "pedestrian_count": len(pedestrians),
+            "pedestrians": pedestrians,
             "frames": public_frames,
         }
         with self._lock:
             self._uploaded_metadata[sample_id] = public_metadata
-            self._uploaded_tensors[sample_id] = tensors
+            self._uploaded_tensors[sample_id] = list(tensors)
             self._uploaded_frames[sample_id] = frames
         return dict(public_metadata)
 

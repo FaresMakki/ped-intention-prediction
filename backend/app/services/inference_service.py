@@ -140,10 +140,13 @@ class InferenceService:
     def predict_all(self) -> dict[str, Any]:
         started = time.perf_counter()
         predictions = [
-            self.predict(sample["id"])
+            self.predict_scene(sample["id"])
             for sample in self.repository.list_prepared_samples()
         ]
-        correct = sum(prediction["is_correct"] for prediction in predictions)
+        correct = sum(
+            prediction["global_decision"]["is_correct"]
+            for prediction in predictions
+        )
         return {
             "predictions": predictions,
             "correct": correct,

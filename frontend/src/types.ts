@@ -122,7 +122,7 @@ export interface ScenePredictionResponse {
 }
 
 export interface BatchPredictionResponse {
-  predictions: PredictionResponse[];
+  predictions: ScenePredictionResponse[];
   correct: number;
   total: number;
   accuracy: number;

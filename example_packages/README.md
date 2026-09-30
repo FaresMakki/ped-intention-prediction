@@ -1,13 +1,15 @@
 # Upload-ready PIE packages
 
-These archives implement version 1 of the exact-model package contract and can
-be uploaded directly from either website page.
+The three main archives implement version 2 of the exact-model package contract
+and can be uploaded directly from either website page. Each contains multiple
+pedestrians aligned to the same 15 source frames.
 
-| Package | Ground truth | PIE source |
-| --- | --- | --- |
-| `pie_no_crossing_example.zip` | No Crossing | set03 / video_0001 / pedestrian 3_1_220 |
-| `pie_crossing_example.zip` | Crossing | set03 / video_0001 / pedestrian 3_1_267 |
-| `pie_irrelevant_example.zip` | Irrelevant | set03 / video_0001 / pedestrian 3_1_236 |
+| Package | Scene ground truth | PIE source | Pedestrians |
+| --- | --- | --- | --- |
+| `pie_no_crossing_example.zip` | No Crossing | set03 / video_0001 | 3_1_221, 3_1_222 |
+| `pie_crossing_example.zip` | Crossing | set03 / video_0003 | 3_3_328, 3_3_329 |
+| `pie_irrelevant_example.zip` | Irrelevant | set03 / video_0009 | 3_9_585, 3_9_586 |
+| `pie_legacy_v1_single_person.zip` | No Crossing | set03 / video_0001 | 3_1_221 |
 
 Each ZIP contains exactly:
 
@@ -19,9 +21,11 @@ frames/frame_01.jpg
 frames/frame_15.jpg
 ```
 
-`tensors.npz` carries all 15 validated arrays needed by the final
-Trajectory + Social pipeline and the five-method comparison page. Arrays use
-the same normalization and schemas as the checkpoints.
+In version 2, every array in `tensors.npz` starts with a pedestrian dimension.
+The remaining dimensions are identical to the checkpoint inputs. The manifest
+lists each pedestrian and provides its box (or `null`) on every frame. The
+legacy archive demonstrates that the original unbatched version-1 format still
+works.
 
 Regenerate the examples from the prepared deployment data with:
 

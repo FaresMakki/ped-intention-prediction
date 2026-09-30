@@ -37,7 +37,7 @@ export function PackageUploader({ uploading, onUpload }: PackageUploaderProps) {
         </span>
         <span>
           <strong>{uploading ? "Validating package" : "Upload package"}</strong>
-          <small>Version 1 ZIP · maximum 25 MB</small>
+          <small>Version 1 or 2 ZIP · maximum 25 MB</small>
         </span>
       </button>
     </div>

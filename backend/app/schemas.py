@@ -101,7 +101,7 @@ class ScenePredictionResponse(ApiModel):
 
 
 class BatchPredictionResponse(ApiModel):
-    predictions: list[PredictionResponse]
+    predictions: list[ScenePredictionResponse]
     correct: int
     total: int
     accuracy: float

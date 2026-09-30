@@ -105,7 +105,7 @@ requests to port 8000.
 ## API
 
 - `GET /api/health` — all checkpoint hashes, epochs, and service readiness.
-- `GET /api/samples` — the 16 example summaries.
+- `GET /api/samples` — the 15 multi-pedestrian scene summaries.
 - `GET /api/samples/{id}` — frames and metadata for one example.
 - `POST /api/samples/{id}/predict` — live final-model inference.
 - `POST /api/samples/{id}/predict-scene` — batched inference for every
@@ -118,15 +118,17 @@ requests to port 8000.
 
 ## Package upload
 
-Both pages accept an exact-model `.zip` package up to 25 MB. A version 1
-package contains `manifest.json`, `tensors.npz`, and exactly 15 consecutive
-JPEG or PNG frames for one pedestrian. The tensor archive contains all model
-representations, so an uploaded sequence works in Live Fusion and Compare
-Models without changing the research inference path. Version 1 uploads appear
-as a one-pedestrian scene in the parallel inference API.
+Both pages accept an exact-model `.zip` package up to 25 MB. Version 2 carries
+one to 16 annotated pedestrians over the same 15 consecutive JPEG or PNG
+frames. Its tensor arrays have a leading pedestrian dimension and every frame
+contains one box entry per pedestrian. Live Fusion batches all pedestrians in
+one model call and applies the global safety rule: if any pedestrian predicts
+Crossing, the scene predicts Crossing. Legacy single-pedestrian version 1
+packages remain supported.
 
-Three ready-to-upload examples are stored in `example_packages/`. Their format
-and regeneration command are documented in `example_packages/README.md`.
+Three ready-to-upload multi-pedestrian examples and one legacy compatibility
+example are stored in `example_packages/`. Their format and regeneration
+command are documented in `example_packages/README.md`.
 
 ## Verification
 

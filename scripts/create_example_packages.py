@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export three deterministic, upload-ready packages from the demo samples."""
+"""Export deterministic v2 multi-pedestrian and legacy v1 example packages."""
 
 from __future__ import annotations
 
@@ -16,9 +16,10 @@ DATA_ROOT = DEPLOYMENT_ROOT / "data"
 OUTPUT_ROOT = DEPLOYMENT_ROOT / "example_packages"
 EXAMPLES = {
     "sample-01": "pie_no_crossing_example.zip",
-    "sample-06": "pie_crossing_example.zip",
-    "sample-11": "pie_irrelevant_example.zip",
+    "sample-07": "pie_crossing_example.zip",
+    "sample-12": "pie_irrelevant_example.zip",
 }
+LEGACY_EXAMPLE = ("sample-01", "pie_legacy_v1_single_person.zip")
 ARRAY_NAMES = (
     "trajectory_nodes",
     "trajectory_adjacency",
@@ -45,35 +46,86 @@ def zip_info(name: str, compression: int) -> zipfile.ZipInfo:
     return info
 
 
-def tensor_archive(arrays: dict[str, np.ndarray], index: int) -> bytes:
+def tensor_archive(
+    arrays: dict[str, np.ndarray],
+    indices: list[int],
+    *,
+    batched: bool,
+) -> bytes:
     stream = io.BytesIO()
+    selected = {
+        name: np.array(
+            arrays[name][indices] if batched else arrays[name][indices[0]],
+            copy=True,
+        )
+        for name in ARRAY_NAMES
+    }
     np.savez_compressed(
         stream,
-        **{name: np.array(arrays[name][index], copy=True) for name in ARRAY_NAMES},
+        **selected,
     )
     return stream.getvalue()
 
 
-def package_manifest(sample: dict) -> dict:
+def package_manifest_v2(sample: dict) -> dict:
     return {
         "format": "pie-crossing-package",
-        "version": 1,
+        "version": 2,
         "frame_count": 15,
         "tensors_file": "tensors.npz",
-        "display_name": f"Uploaded {sample['class_name']} example",
-        "sample_index": sample["sample_index"],
+        "display_name": f"Uploaded multi-ped {sample['class_name']} scene",
         "set_id": sample["set_id"],
         "video_id": sample["video_id"],
-        "pedestrian_id": sample["pedestrian_id"],
-        "class_name": sample["class_name"],
-        "raw_class": sample["raw_class"],
-        "binary_target": sample["binary_target"],
+        "pedestrians": [
+            {
+                "sample_index": pedestrian["sample_index"],
+                "pedestrian_id": pedestrian["pedestrian_id"],
+                "class_name": pedestrian["class_name"],
+                "raw_class": pedestrian["raw_class"],
+                "binary_target": pedestrian["binary_target"],
+                "color": pedestrian["color"],
+            }
+            for pedestrian in sample["pedestrians"]
+        ],
         "frames": [
             {
                 "ordinal": frame["ordinal"],
                 "source_frame": frame["source_frame"],
                 "file": f"frames/frame_{frame['ordinal']:02d}.jpg",
-                "target_box": frame["target_box"],
+                "pedestrian_boxes": [
+                    {
+                        "pedestrian_id": box["pedestrian_id"],
+                        "box": box["box"],
+                    }
+                    for box in frame["pedestrian_boxes"]
+                ],
+            }
+            for frame in sample["frames"]
+        ],
+    }
+
+
+def package_manifest_v1(sample: dict) -> dict:
+    pedestrian = sample["pedestrians"][0]
+    return {
+        "format": "pie-crossing-package",
+        "version": 1,
+        "frame_count": 15,
+        "tensors_file": "tensors.npz",
+        "display_name": "Legacy single-pedestrian example",
+        "sample_index": pedestrian["sample_index"],
+        "set_id": sample["set_id"],
+        "video_id": sample["video_id"],
+        "pedestrian_id": pedestrian["pedestrian_id"],
+        "class_name": pedestrian["class_name"],
+        "raw_class": pedestrian["raw_class"],
+        "binary_target": pedestrian["binary_target"],
+        "frames": [
+            {
+                "ordinal": frame["ordinal"],
+                "source_frame": frame["source_frame"],
+                "file": f"frames/frame_{frame['ordinal']:02d}.jpg",
+                "target_box": frame["pedestrian_boxes"][0]["box"],
             }
             for frame in sample["frames"]
         ],
@@ -84,10 +136,20 @@ def write_package(
     destination: Path,
     sample: dict,
     arrays: dict[str, np.ndarray],
+    *,
+    legacy: bool = False,
 ) -> None:
-    manifest = package_manifest(sample)
+    manifest = package_manifest_v1(sample) if legacy else package_manifest_v2(sample)
     manifest_bytes = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
-    tensors = tensor_archive(arrays, int(sample["tensor_index"]))
+    tensor_indices = [
+        int(pedestrian["tensor_index"])
+        for pedestrian in sample["pedestrians"]
+    ]
+    tensors = tensor_archive(
+        arrays,
+        tensor_indices[:1] if legacy else tensor_indices,
+        batched=not legacy,
+    )
     with zipfile.ZipFile(destination, "w", allowZip64=False) as archive:
         archive.writestr(
             zip_info("manifest.json", zipfile.ZIP_DEFLATED),
@@ -117,6 +179,11 @@ def main() -> None:
         write_package(destination, samples[sample_id], arrays)
         digest = hashlib.sha256(destination.read_bytes()).hexdigest()
         print(f"{destination.name}: {destination.stat().st_size} bytes, sha256={digest}")
+    sample_id, filename = LEGACY_EXAMPLE
+    destination = OUTPUT_ROOT / filename
+    write_package(destination, samples[sample_id], arrays, legacy=True)
+    digest = hashlib.sha256(destination.read_bytes()).hexdigest()
+    print(f"{destination.name}: {destination.stat().st_size} bytes, sha256={digest}")
 
 
 if __name__ == "__main__":

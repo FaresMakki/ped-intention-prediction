@@ -10,10 +10,11 @@ def test_health_and_prediction_contract() -> None:
         health = client.get("/api/health")
         assert health.status_code == 200
         assert health.json()["models_loaded"] is True
-        assert health.json()["sample_count"] == 16
+        assert health.json()["sample_count"] == 15
 
         samples = client.get("/api/samples").json()
-        assert len(samples) == 16
+        assert len(samples) == 15
+        assert all(sample["pedestrian_count"] >= 2 for sample in samples)
         response = client.post(f"/api/samples/{samples[0]['id']}/predict")
         assert response.status_code == 200
         result = response.json()
@@ -38,35 +39,45 @@ def test_health_and_prediction_contract() -> None:
         assert comparison_result["agreement"]["total_methods"] == 5
 
 
-def test_parallel_scene_runs_each_pedestrian_and_uses_global_or() -> None:
+def test_every_scene_is_parallel_and_uses_global_or() -> None:
     with TestClient(app) as client:
-        sample = client.get("/api/samples/sample-16").json()
-        assert sample["pedestrian_count"] == 2
-        assert [person["pedestrian_id"] for person in sample["pedestrians"]] == [
-            "3_8_547",
-            "3_8_548",
-        ]
-        assert all(len(frame["pedestrian_boxes"]) == 2 for frame in sample["frames"])
-        assert all(
-            person["box"] is not None
-            for frame in sample["frames"]
-            for person in frame["pedestrian_boxes"]
-        )
+        summaries = client.get("/api/samples").json()
+        for summary in summaries:
+            sample = client.get(f"/api/samples/{summary['id']}").json()
+            pedestrian_count = sample["pedestrian_count"]
+            assert 2 <= pedestrian_count <= 4
+            assert len(sample["pedestrians"]) == pedestrian_count
+            assert all(
+                len(frame["pedestrian_boxes"]) == pedestrian_count
+                for frame in sample["frames"]
+            )
+            assert all(
+                person["box"] is not None
+                for frame in sample["frames"]
+                for person in frame["pedestrian_boxes"]
+            )
 
-        response = client.post("/api/samples/sample-16/predict-scene")
+        response = client.post("/api/samples/sample-06/predict-scene")
         assert response.status_code == 200, response.text
         result = response.json()
-        assert result["pedestrian_count"] == 2
-        assert [
+        assert result["pedestrian_count"] == 3
+        individual = [
             prediction["fusion"]["binary_prediction"]
             for prediction in result["predictions"]
-        ] == [1, 0]
-        assert result["global_decision"]["binary_prediction"] == 1
-        assert result["global_decision"]["binary_label"] == "Crossing"
-        assert result["global_decision"]["crossing_pedestrian_ids"] == ["3_8_547"]
-        assert result["global_decision"]["not_crossing_pedestrian_ids"] == [
-            "3_8_548"
         ]
+        assert result["global_decision"]["binary_prediction"] == int(any(individual))
+        assert len(result["global_decision"]["crossing_pedestrian_ids"]) == sum(
+            individual
+        )
+
+        batch = client.post("/api/predict-all")
+        assert batch.status_code == 200, batch.text
+        batch_result = batch.json()
+        assert batch_result["total"] == 15
+        assert all(
+            prediction["pedestrian_count"] >= 2
+            for prediction in batch_result["predictions"]
+        )
 
 
 def test_unknown_sample_is_not_found() -> None:

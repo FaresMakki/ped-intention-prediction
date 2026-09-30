@@ -35,12 +35,9 @@ export function LiveFusionPage() {
   useEffect(() => {
     Promise.all([api.health(), api.samples()])
       .then(([healthResponse, sampleResponse]) => {
-        const orderedSamples = [...sampleResponse].sort(
-          (left, right) => right.pedestrian_count - left.pedestrian_count,
-        );
         setHealth(healthResponse);
-        setSamples(orderedSamples);
-        if (orderedSamples.length) setSelectedId(orderedSamples[0].id);
+        setSamples(sampleResponse);
+        if (sampleResponse.length) setSelectedId(sampleResponse[0].id);
       })
       .catch((reason: Error) => setError(reason.message));
   }, []);
