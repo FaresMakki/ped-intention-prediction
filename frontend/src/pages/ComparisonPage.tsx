@@ -23,6 +23,7 @@ export function ComparisonPage() {
   const [filter, setFilter] = useState<FilterName>("All");
   const [loadingSample, setLoadingSample] = useState(false);
   const [comparing, setComparing] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -59,6 +60,25 @@ export function ComparisonPage() {
     }
   }
 
+  async function uploadPackage(file: File) {
+    setUploading(true);
+    setError("");
+    try {
+      const uploaded = await api.uploadPackage(file);
+      setSamples((current) => [
+        uploaded.summary,
+        ...current.filter((item) => item.id !== uploaded.summary.id),
+      ]);
+      setSelectedId(uploaded.sample.id);
+    } catch (reason) {
+      setError(
+        reason instanceof Error ? reason.message : "Package upload failed",
+      );
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <div className="app-shell">
       <AppHeader
@@ -86,8 +106,10 @@ export function ComparisonPage() {
           filter={filter}
           onFilterChange={setFilter}
           onSelect={setSelectedId}
+          onUpload={uploadPackage}
           samples={samples}
           selectedId={selectedId}
+          uploading={uploading}
         />
 
         <div className="analysis-column comparison-column">

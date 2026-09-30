@@ -1,4 +1,5 @@
 import type { FilterName, SampleSummary } from "../types";
+import { PackageUploader } from "./PackageUploader";
 
 const FILTERS: FilterName[] = ["All", "No Crossing", "Crossing", "Irrelevant"];
 
@@ -8,6 +9,8 @@ interface SampleLibraryProps {
   filter: FilterName;
   onFilterChange: (filter: FilterName) => void;
   onSelect: (id: string) => void;
+  onUpload: (file: File) => Promise<void>;
+  uploading: boolean;
 }
 
 function classToken(className: string) {
@@ -20,6 +23,8 @@ export function SampleLibrary({
   filter,
   onFilterChange,
   onSelect,
+  onUpload,
+  uploading,
 }: SampleLibraryProps) {
   const visible = samples.filter(
     (sample) => filter === "All" || sample.class_name === filter,
@@ -30,10 +35,12 @@ export function SampleLibrary({
       <div className="library-heading">
         <div>
           <p className="eyebrow">Test collection</p>
-          <h2>15 prepared sequences</h2>
+          <h2>Sequences</h2>
         </div>
         <span className="count-badge">{visible.length}</span>
       </div>
+
+      <PackageUploader onUpload={onUpload} uploading={uploading} />
 
       <div className="filter-row" role="group" aria-label="Filter examples">
         {FILTERS.map((item) => (
@@ -67,6 +74,9 @@ export function SampleLibrary({
               <span className={`class-pill ${classToken(sample.class_name)}`}>
                 {sample.class_name}
               </span>
+              {sample.source === "upload" && (
+                <span className="upload-pill">Uploaded</span>
+              )}
             </span>
             <span className="sample-arrow" aria-hidden="true">
               ›

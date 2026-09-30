@@ -85,8 +85,16 @@ class ComparisonService:
     def predict(self, sample_id: str) -> dict[str, Any]:
         metadata = self.repository.get_metadata(sample_id)
         tensors = self.repository.get_tensors(sample_id)
+        return self.predict_tensors(metadata, tensors)
+
+    def predict_tensors(
+        self,
+        metadata: dict[str, Any],
+        tensors: SampleTensors,
+    ) -> dict[str, Any]:
+        """Run every comparison checkpoint on one validated tensor bundle."""
         started = time.perf_counter()
-        primary = self.primary_service.predict(sample_id)
+        primary = self.primary_service.predict_tensors(metadata, tensors)
         with self._lock, torch.inference_mode():
             logits = self._run_comparison_models(tensors)
         final_logits = torch.tensor(

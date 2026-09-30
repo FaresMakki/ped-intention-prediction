@@ -30,6 +30,7 @@ class SampleSummary(ApiModel):
     raw_class: int
     binary_target: int
     poster_url: str
+    source: str
 
 
 class FrameInfo(ApiModel):
@@ -51,6 +52,12 @@ class SampleDetail(ApiModel):
     raw_class: int
     binary_target: int
     frames: list[FrameInfo]
+    source: str
+
+
+class PackageUploadResponse(ApiModel):
+    summary: SampleSummary
+    sample: SampleDetail
 
 
 class PredictionResponse(ApiModel):

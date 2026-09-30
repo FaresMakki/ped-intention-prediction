@@ -24,6 +24,7 @@ export interface SampleSummary {
   raw_class: number;
   binary_target: number;
   poster_url: string;
+  source: "prepared" | "upload";
 }
 
 export interface FrameInfo {
@@ -36,6 +37,11 @@ export interface FrameInfo {
 export interface SampleDetail extends Omit<SampleSummary, "poster_url"> {
   tensor_index: number;
   frames: FrameInfo[];
+}
+
+export interface PackageUploadResponse {
+  summary: SampleSummary;
+  sample: SampleDetail;
 }
 
 export interface SourceOutput {

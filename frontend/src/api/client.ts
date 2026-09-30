@@ -2,6 +2,7 @@ import type {
   BatchPredictionResponse,
   ComparisonResponse,
   HealthResponse,
+  PackageUploadResponse,
   PredictionResponse,
   SampleDetail,
   SampleSummary,
@@ -31,5 +32,14 @@ export const api = {
   compare: (id: string) =>
     request<ComparisonResponse>(`/api/comparison/samples/${id}/predict`, {
       method: "POST",
+    }),
+  uploadPackage: (file: File) =>
+    request<PackageUploadResponse>("/api/uploads", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/zip",
+        "X-File-Name": encodeURIComponent(file.name),
+      },
+      body: file,
     }),
 };

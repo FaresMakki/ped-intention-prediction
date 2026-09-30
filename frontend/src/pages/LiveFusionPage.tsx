@@ -25,6 +25,7 @@ export function LiveFusionPage() {
   const [loadingSample, setLoadingSample] = useState(false);
   const [predicting, setPredicting] = useState(false);
   const [batching, setBatching] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [batch, setBatch] = useState<BatchPredictionResponse | null>(null);
   const [error, setError] = useState("");
 
@@ -81,6 +82,25 @@ export function LiveFusionPage() {
     }
   }
 
+  async function uploadPackage(file: File) {
+    setUploading(true);
+    setError("");
+    try {
+      const uploaded = await api.uploadPackage(file);
+      setSamples((current) => [
+        uploaded.summary,
+        ...current.filter((item) => item.id !== uploaded.summary.id),
+      ]);
+      setSelectedId(uploaded.sample.id);
+    } catch (reason) {
+      setError(
+        reason instanceof Error ? reason.message : "Package upload failed",
+      );
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <div className="app-shell">
       <AppHeader
@@ -127,8 +147,10 @@ export function LiveFusionPage() {
           filter={filter}
           onFilterChange={setFilter}
           onSelect={setSelectedId}
+          onUpload={uploadPackage}
           samples={samples}
           selectedId={selectedId}
+          uploading={uploading}
         />
 
         <div className="analysis-column">

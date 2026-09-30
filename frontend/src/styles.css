@@ -262,6 +262,58 @@ h2 {
   gap: 4px;
   margin: 18px 0 14px;
 }
+.package-uploader {
+  margin: 16px 0 11px;
+}
+.package-uploader input {
+  display: none;
+}
+.package-uploader button {
+  width: 100%;
+  min-height: 55px;
+  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px dashed #426653;
+  background: #101b16;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+.package-uploader button:hover:not(:disabled) {
+  border-color: var(--green);
+  background: #14241c;
+}
+.package-uploader button > span:last-child {
+  min-width: 0;
+}
+.package-uploader strong,
+.package-uploader small {
+  display: block;
+}
+.package-uploader strong {
+  font-size: 11px;
+}
+.package-uploader small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+}
+.upload-icon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #3c6d53;
+  color: var(--green);
+  font:
+    700 16px/1 ui-monospace,
+    monospace;
+}
 .filter-row button {
   border: 1px solid transparent;
   background: transparent;
@@ -276,7 +328,7 @@ h2 {
   background: #14241c;
 }
 .sample-list {
-  height: calc(100vh - 196px);
+  height: calc(100vh - 272px);
   overflow-y: auto;
   padding-right: 4px;
   scrollbar-color: #34453c transparent;
@@ -346,6 +398,18 @@ h2 {
 .class-pill.irrelevant {
   color: #e8ca87;
   border-color: #66552d;
+}
+.upload-pill {
+  display: inline-flex;
+  width: max-content;
+  margin-left: 4px;
+  padding: 2px 5px;
+  border: 1px solid #775d36;
+  color: #ffd999;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 .sample-arrow {
   color: #587066;

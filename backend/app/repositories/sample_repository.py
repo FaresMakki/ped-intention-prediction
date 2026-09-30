@@ -5,7 +5,9 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from threading import RLock
 from typing import Any
+from uuid import uuid4
 
 import numpy as np
 
@@ -29,8 +31,14 @@ class SampleTensors:
     relation_risk_mask: np.ndarray
 
 
+@dataclass(frozen=True)
+class UploadedFrame:
+    content: bytes
+    media_type: str
+
+
 class SampleRepository:
-    """Load metadata and tensors once, then expose immutable sample views."""
+    """Expose prepared samples plus validated, in-memory package uploads."""
 
     REQUIRED_ARRAYS = (
         "trajectory_nodes",
@@ -64,21 +72,45 @@ class SampleRepository:
         self._arrays = {name: archive[name] for name in self.REQUIRED_ARRAYS}
         if any(array.shape[0] != len(self._samples) for array in self._arrays.values()):
             raise ValueError("Prepared arrays do not match the manifest sample count.")
+        self._uploaded_metadata: dict[str, dict[str, Any]] = {}
+        self._uploaded_tensors: dict[str, SampleTensors] = {}
+        self._uploaded_frames: dict[str, dict[int, UploadedFrame]] = {}
+        self._lock = RLock()
 
     @property
     def selection(self) -> dict[str, Any]:
         return self._manifest["selection"]
 
     def list_samples(self) -> list[dict[str, Any]]:
+        with self._lock:
+            uploaded = list(reversed(self._uploaded_metadata.values()))
+        return [self._summary(sample) for sample in uploaded] + [
+            self._summary(sample) for sample in self._samples
+        ]
+
+    def list_prepared_samples(self) -> list[dict[str, Any]]:
         return [self._summary(sample) for sample in self._samples]
 
     def get_metadata(self, sample_id: str) -> dict[str, Any]:
+        with self._lock:
+            uploaded = self._uploaded_metadata.get(sample_id)
+        if uploaded is not None:
+            return dict(uploaded)
         try:
-            return dict(self._by_id[sample_id])
+            metadata = dict(self._by_id[sample_id])
+            metadata["source"] = "prepared"
+            return metadata
         except KeyError as error:
             raise KeyError(f"Unknown sample: {sample_id}") from error
 
+    def get_summary(self, sample_id: str) -> dict[str, Any]:
+        return self._summary(self.get_metadata(sample_id))
+
     def get_tensors(self, sample_id: str) -> SampleTensors:
+        with self._lock:
+            uploaded = self._uploaded_tensors.get(sample_id)
+        if uploaded is not None:
+            return uploaded
         metadata = self.get_metadata(sample_id)
         index = int(metadata["tensor_index"])
         return SampleTensors(
@@ -99,6 +131,43 @@ class SampleRepository:
             relation_risk_mask=self._arrays["relation_risk_mask"][index],
         )
 
+    def add_uploaded_sample(
+        self,
+        metadata: dict[str, Any],
+        tensors: SampleTensors,
+        frames: dict[int, UploadedFrame],
+    ) -> dict[str, Any]:
+        """Register one validated package and return its public metadata."""
+        sample_id = f"upload-{uuid4().hex[:12]}"
+        public_frames = [
+            {
+                **frame,
+                "url": f"/api/uploads/{sample_id}/frames/{frame['ordinal']}",
+            }
+            for frame in metadata["frames"]
+        ]
+        public_metadata = {
+            **metadata,
+            "id": sample_id,
+            "tensor_index": -1,
+            "source": "upload",
+            "frames": public_frames,
+        }
+        with self._lock:
+            self._uploaded_metadata[sample_id] = public_metadata
+            self._uploaded_tensors[sample_id] = tensors
+            self._uploaded_frames[sample_id] = frames
+        return dict(public_metadata)
+
+    def get_uploaded_frame(self, sample_id: str, ordinal: int) -> UploadedFrame:
+        with self._lock:
+            try:
+                return self._uploaded_frames[sample_id][ordinal]
+            except KeyError as error:
+                raise KeyError(
+                    f"Unknown uploaded frame: {sample_id}/{ordinal}"
+                ) from error
+
     @staticmethod
     def _summary(sample: dict[str, Any]) -> dict[str, Any]:
         return {
@@ -112,4 +181,5 @@ class SampleRepository:
             "raw_class": sample["raw_class"],
             "binary_target": sample["binary_target"],
             "poster_url": sample["frames"][7]["url"],
+            "source": sample.get("source", "prepared"),
         }

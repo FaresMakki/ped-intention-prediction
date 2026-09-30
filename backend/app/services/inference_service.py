@@ -60,6 +60,14 @@ class InferenceService:
     def predict(self, sample_id: str) -> dict[str, Any]:
         metadata = self.repository.get_metadata(sample_id)
         tensors = self.repository.get_tensors(sample_id)
+        return self.predict_tensors(metadata, tensors)
+
+    def predict_tensors(
+        self,
+        metadata: dict[str, Any],
+        tensors: SampleTensors,
+    ) -> dict[str, Any]:
+        """Run inference for prepared or validated uploaded tensors."""
         started = time.perf_counter()
         with self._lock, torch.inference_mode():
             trajectory_logits, social_logits = self._run_models(tensors)
@@ -74,7 +82,8 @@ class InferenceService:
     def predict_all(self) -> dict[str, Any]:
         started = time.perf_counter()
         predictions = [
-            self.predict(sample["id"]) for sample in self.repository.list_samples()
+            self.predict(sample["id"])
+            for sample in self.repository.list_prepared_samples()
         ]
         correct = sum(prediction["is_correct"] for prediction in predictions)
         return {

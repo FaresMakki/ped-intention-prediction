@@ -105,7 +105,20 @@ requests to port 8000.
 - `POST /api/samples/{id}/predict` — live final-model inference.
 - `POST /api/predict-all` — evaluate the final model on all prepared examples.
 - `POST /api/comparison/samples/{id}/predict` — run the five-method comparison.
+- `POST /api/uploads` — validate and register one versioned package ZIP.
+- `GET /api/uploads/{id}/frames/{ordinal}` — serve a validated uploaded frame.
 - `GET /openapi.json` — OpenAPI schema.
+
+## Package upload
+
+Both pages accept an exact-model `.zip` package up to 25 MB. A version 1
+package contains `manifest.json`, `tensors.npz`, and exactly 15 consecutive
+JPEG or PNG frames. The tensor archive contains all model representations, so
+an uploaded sequence works in Live Fusion and Compare Models without changing
+the research inference path.
+
+Three ready-to-upload examples are stored in `example_packages/`. Their format
+and regeneration command are documented in `example_packages/README.md`.
 
 ## Verification
 
