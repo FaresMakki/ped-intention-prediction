@@ -399,7 +399,8 @@ h2 {
   color: #e8ca87;
   border-color: #66552d;
 }
-.upload-pill {
+.upload-pill,
+.parallel-pill {
   display: inline-flex;
   width: max-content;
   margin-left: 4px;
@@ -410,6 +411,10 @@ h2 {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+.parallel-pill {
+  border-color: #366f59;
+  color: var(--green);
 }
 .sample-arrow {
   color: #587066;

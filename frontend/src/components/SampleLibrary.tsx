@@ -76,6 +76,9 @@ export function SampleLibrary({
               <span className={`class-pill ${classToken(sample.class_name)}`}>
                 {sample.class_name}
               </span>
+              {sample.pedestrian_count > 1 && (
+                <span className="parallel-pill">Parallel</span>
+              )}
               {sample.source === "upload" && (
                 <span className="upload-pill">Uploaded</span>
               )}
