@@ -29,7 +29,13 @@ def test_health_and_prediction_contract() -> None:
         comparison = client.post(f"/api/comparison/samples/{samples[0]['id']}/predict")
         assert comparison.status_code == 200
         comparison_result = comparison.json()
-        assert [method["id"] for method in comparison_result["methods"]] == [
+        assert comparison_result["pedestrian_count"] == samples[0][
+            "pedestrian_count"
+        ]
+        assert len(comparison_result["pedestrians"]) == samples[0][
+            "pedestrian_count"
+        ]
+        assert [method["id"] for method in comparison_result["global_methods"]] == [
             "trajectory_social",
             "relation_risk",
             "environment",
@@ -37,6 +43,16 @@ def test_health_and_prediction_contract() -> None:
             "skeleton",
         ]
         assert comparison_result["agreement"]["total_methods"] == 5
+        for global_method in comparison_result["global_methods"]:
+            individual = [
+                next(
+                    method
+                    for method in person["methods"]
+                    if method["id"] == global_method["id"]
+                )["binary_prediction"]
+                for person in comparison_result["pedestrians"]
+            ]
+            assert global_method["binary_prediction"] == int(any(individual))
 
 
 def test_every_scene_is_parallel_and_uses_global_or() -> None:

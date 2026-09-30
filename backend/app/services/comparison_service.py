@@ -7,9 +7,10 @@ from pathlib import Path
 from threading import Lock
 from typing import Any
 
+import numpy as np
 import torch
 
-from app.ml.checkpoint_loader import load_checkpoint, sha256, to_tensor
+from app.ml.checkpoint_loader import load_checkpoint, sha256
 from app.ml.environment_skeleton_fusion import (
     build_environment_skeleton_fusion,
     normalized_meta_features,
@@ -83,59 +84,87 @@ class ComparisonService:
         }
 
     def predict(self, sample_id: str) -> dict[str, Any]:
-        metadata = self.repository.get_metadata(sample_id)
-        tensors = self.repository.get_tensors(sample_id)
-        return self.predict_tensors(metadata, tensors)
-
-    def predict_tensors(
-        self,
-        metadata: dict[str, Any],
-        tensors: SampleTensors,
-    ) -> dict[str, Any]:
-        """Run every comparison checkpoint on one validated tensor bundle."""
+        """Compare every model for every pedestrian and aggregate scene risk."""
         started = time.perf_counter()
-        primary = self.primary_service.predict_tensors(metadata, tensors)
+        members = self.repository.get_scene_members(sample_id)
+        primary_predictions = self.primary_service.predict_members(members)
         with self._lock, torch.inference_mode():
-            logits = self._run_comparison_models(tensors)
-        final_logits = torch.tensor(
-            [[primary["fusion"]["logits"][name] for name in CLASS_NAMES]],
-            dtype=torch.float64,
+            batched_logits = self._run_comparison_models_batch(
+                [tensors for _metadata, tensors in members]
+            )
+
+        pedestrian_results = []
+        for index, ((metadata, _tensors), primary) in enumerate(
+            zip(members, primary_predictions, strict=True)
+        ):
+            logits = {
+                method_id: values[index : index + 1]
+                for method_id, values in batched_logits.items()
+            }
+            logits["trajectory_social"] = torch.tensor(
+                [[primary["fusion"]["logits"][name] for name in CLASS_NAMES]],
+                dtype=torch.float64,
+            )
+            methods = [
+                self._method_result(method_id, logits[method_id], metadata)
+                for method_id in METHOD_ORDER
+            ]
+            pedestrian_results.append(
+                {
+                    "pedestrian_id": metadata["pedestrian_id"],
+                    "sample_index": metadata["sample_index"],
+                    "ground_truth": primary["ground_truth"],
+                    "methods": methods,
+                    "agreement": self._agreement(methods),
+                }
+            )
+
+        global_target = int(
+            any(
+                person["ground_truth"]["binary_target"]
+                for person in pedestrian_results
+            )
         )
-        logits["trajectory_social"] = final_logits
-        methods = [
-            self._method_result(method_id, logits[method_id], metadata)
+        global_methods = [
+            self._global_method_result(
+                method_id,
+                pedestrian_results,
+                global_target,
+            )
             for method_id in METHOD_ORDER
         ]
-        predictions = [method["binary_prediction"] for method in methods]
-        correct_count = sum(method["is_correct"] for method in methods)
-        crossing_votes = sum(predictions)
         return {
-            "sample_id": metadata["id"],
-            "sample_index": metadata["sample_index"],
-            "ground_truth": primary["ground_truth"],
-            "methods": methods,
-            "agreement": {
-                "unanimous": len(set(predictions)) == 1,
-                "crossing_votes": crossing_votes,
-                "not_crossing_votes": len(methods) - crossing_votes,
-                "correct_methods": correct_count,
-                "total_methods": len(methods),
+            "sample_id": sample_id,
+            "pedestrian_count": len(pedestrian_results),
+            "pedestrians": pedestrian_results,
+            "global_methods": global_methods,
+            "global_ground_truth": {
+                "binary_target": global_target,
+                "binary_label": "Crossing" if global_target else "Not Crossing",
             },
+            "agreement": self._agreement(global_methods),
             "latency_ms": round((time.perf_counter() - started) * 1000, 2),
         }
 
-    def _run_comparison_models(
+    def _run_comparison_models_batch(
         self,
-        tensors: SampleTensors,
+        tensors: list[SampleTensors],
     ) -> dict[str, torch.Tensor]:
+        def batch(name: str) -> torch.Tensor:
+            values = np.stack([getattr(item, name) for item in tensors]).astype(
+                np.float32,
+                copy=False,
+            )
+            return torch.from_numpy(values).to(self.device)
+
         environment_logits = self.environment_model(
-            to_tensor(tensors.environment_nodes, self.device),
-            to_tensor(tensors.environment_adjacency, self.device),
-            to_tensor(tensors.environment_mask, self.device),
+            batch("environment_nodes"),
+            batch("environment_adjacency"),
+            batch("environment_mask"),
         )
-        skeleton_input = to_tensor(tensors.skeleton_input, self.device)
-        keypoint_mask = to_tensor(tensors.skeleton_keypoint_mask, self.device)
-        frame_mask = to_tensor(tensors.skeleton_frame_mask, self.device)
+        skeleton_input = batch("skeleton_input")
+        keypoint_mask = batch("skeleton_keypoint_mask")
+        frame_mask = batch("skeleton_frame_mask")
         skeleton_logits = self.skeleton_model(
             skeleton_input,
             keypoint_mask,
@@ -155,9 +184,9 @@ class ComparisonService:
             meta_features,
         )
         relation_risk_logits = self.relation_risk_model(
-            to_tensor(tensors.relation_risk_nodes, self.device),
-            to_tensor(tensors.relation_risk_adjacency, self.device),
-            to_tensor(tensors.relation_risk_mask, self.device),
+            batch("relation_risk_nodes"),
+            batch("relation_risk_adjacency"),
+            batch("relation_risk_mask"),
         )
         return {
             "environment": environment_logits.cpu(),
@@ -177,15 +206,10 @@ class ComparisonService:
         prediction = int(binary_prediction.item())
         three_class_index = int(probabilities.argmax(dim=1).item())
         catalog = METHOD_CATALOG[method_id]
-        checkpoint = (
-            "trajectory_model.pt + social_model.pt"
-            if method_id == "trajectory_social"
-            else self.model_info[method_id]["file"]
-        )
         return {
             "id": method_id,
             **catalog,
-            "checkpoint": checkpoint,
+            "checkpoint": self._checkpoint_for(method_id),
             "logits": self._class_values(logits),
             "probabilities": self._class_values(probabilities),
             "three_class_prediction": CLASS_NAMES[three_class_index],
@@ -194,6 +218,57 @@ class ComparisonService:
             "binary_label": "Crossing" if prediction else "Not Crossing",
             "threshold": 0.5,
             "is_correct": prediction == int(metadata["binary_target"]),
+        }
+
+    def _global_method_result(
+        self,
+        method_id: str,
+        pedestrians: list[dict[str, Any]],
+        global_target: int,
+    ) -> dict[str, Any]:
+        individual_methods = [
+            next(method for method in person["methods"] if method["id"] == method_id)
+            for person in pedestrians
+        ]
+        crossing_ids = [
+            person["pedestrian_id"]
+            for person, method in zip(pedestrians, individual_methods, strict=True)
+            if method["binary_prediction"]
+        ]
+        not_crossing_ids = [
+            person["pedestrian_id"]
+            for person, method in zip(pedestrians, individual_methods, strict=True)
+            if not method["binary_prediction"]
+        ]
+        prediction = int(bool(crossing_ids))
+        return {
+            "id": method_id,
+            **METHOD_CATALOG[method_id],
+            "checkpoint": self._checkpoint_for(method_id),
+            "binary_score": max(method["binary_score"] for method in individual_methods),
+            "binary_prediction": prediction,
+            "binary_label": "Crossing" if prediction else "Not Crossing",
+            "threshold": 0.5,
+            "crossing_pedestrian_ids": crossing_ids,
+            "not_crossing_pedestrian_ids": not_crossing_ids,
+            "is_correct": prediction == global_target,
+        }
+
+    def _checkpoint_for(self, method_id: str) -> str:
+        if method_id == "trajectory_social":
+            return "trajectory_model.pt + social_model.pt"
+        return str(self.model_info[method_id]["file"])
+
+    @staticmethod
+    def _agreement(methods: list[dict[str, Any]]) -> dict[str, Any]:
+        predictions = [method["binary_prediction"] for method in methods]
+        crossing_votes = sum(predictions)
+        return {
+            "unanimous": len(set(predictions)) == 1,
+            "crossing_votes": crossing_votes,
+            "not_crossing_votes": len(methods) - crossing_votes,
+            "correct_methods": sum(method["is_correct"] for method in methods),
+            "total_methods": len(methods),
         }
 
     @staticmethod

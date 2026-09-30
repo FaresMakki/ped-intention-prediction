@@ -110,8 +110,9 @@ class BatchPredictionResponse(ApiModel):
 
 class ComparisonResponse(ApiModel):
     sample_id: str
-    sample_index: int
-    ground_truth: dict[str, Any]
-    methods: list[dict[str, Any]]
+    pedestrian_count: int
+    pedestrians: list[dict[str, Any]]
+    global_methods: list[dict[str, Any]]
+    global_ground_truth: dict[str, Any]
     agreement: dict[str, Any]
     latency_ms: float

@@ -62,42 +62,50 @@ def test_comparison_models_reproduce_research_outputs() -> None:
     )
 
     for sample in repository.list_samples():
-        source_index = sample["sample_index"]
         result = service.predict(sample["id"])
-        methods = {method["id"]: method for method in result["methods"]}
-        environment = np.array(list(methods["environment"]["logits"].values()))
-        skeleton = np.array(list(methods["skeleton"]["logits"].values()))
-        np.testing.assert_allclose(
-            environment,
-            environment_reference[source_index],
-            atol=1e-5,
-        )
-        np.testing.assert_allclose(
-            skeleton,
-            skeleton_reference[source_index],
-            atol=1e-5,
-        )
+        assert result["pedestrian_count"] == sample["pedestrian_count"]
+        for pedestrian in result["pedestrians"]:
+            source_index = pedestrian["sample_index"]
+            methods = {
+                method["id"]: method for method in pedestrian["methods"]
+            }
+            environment = np.array(
+                list(methods["environment"]["logits"].values())
+            )
+            skeleton = np.array(list(methods["skeleton"]["logits"].values()))
+            np.testing.assert_allclose(
+                environment,
+                environment_reference[source_index],
+                atol=1e-5,
+            )
+            np.testing.assert_allclose(
+                skeleton,
+                skeleton_reference[source_index],
+                atol=1e-5,
+            )
 
-        fusion_row = fusion_rows[source_index]
-        expected_fusion = np.array(
-            [
-                fusion_row["final_logit_no_crossing"],
-                fusion_row["final_logit_crossing"],
-                fusion_row["final_logit_irrelevant"],
-            ],
-            dtype=np.float64,
-        )
-        fusion = np.array(list(methods["environment_skeleton"]["logits"].values()))
-        np.testing.assert_allclose(fusion, expected_fusion, atol=1e-5)
+            fusion_row = fusion_rows[source_index]
+            expected_fusion = np.array(
+                [
+                    fusion_row["final_logit_no_crossing"],
+                    fusion_row["final_logit_crossing"],
+                    fusion_row["final_logit_irrelevant"],
+                ],
+                dtype=np.float64,
+            )
+            fusion = np.array(
+                list(methods["environment_skeleton"]["logits"].values())
+            )
+            np.testing.assert_allclose(fusion, expected_fusion, atol=1e-5)
 
-        risk_row = risk_rows[source_index]
-        expected_risk = np.array(
-            [
-                risk_row["logit_no_crossing"],
-                risk_row["logit_crossing"],
-                risk_row["logit_irrelevant"],
-            ],
-            dtype=np.float64,
-        )
-        risk = np.array(list(methods["relation_risk"]["logits"].values()))
-        np.testing.assert_allclose(risk, expected_risk, atol=1e-5)
+            risk_row = risk_rows[source_index]
+            expected_risk = np.array(
+                [
+                    risk_row["logit_no_crossing"],
+                    risk_row["logit_crossing"],
+                    risk_row["logit_irrelevant"],
+                ],
+                dtype=np.float64,
+            )
+            risk = np.array(list(methods["relation_risk"]["logits"].values()))
+            np.testing.assert_allclose(risk, expected_risk, atol=1e-5)

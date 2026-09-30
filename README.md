@@ -111,7 +111,8 @@ requests to port 8000.
 - `POST /api/samples/{id}/predict-scene` — batched inference for every
   annotated pedestrian plus the global OR decision.
 - `POST /api/predict-all` — evaluate the final model on all prepared examples.
-- `POST /api/comparison/samples/{id}/predict` — run the five-method comparison.
+- `POST /api/comparison/samples/{id}/predict` — batch every pedestrian through
+  all five methods and return individual plus global scene comparisons.
 - `POST /api/uploads` — validate and register one versioned package ZIP.
 - `GET /api/uploads/{id}/frames/{ordinal}` — serve a validated uploaded frame.
 - `GET /openapi.json` — OpenAPI schema.
@@ -126,8 +127,9 @@ one model call and applies the global safety rule: if any pedestrian predicts
 Crossing, the scene predicts Crossing. Legacy single-pedestrian version 1
 packages remain supported.
 
-Three ready-to-upload multi-pedestrian examples and one legacy compatibility
-example are stored in `example_packages/`. Their format and regeneration
+Six ready-to-upload multi-pedestrian examples and one legacy compatibility
+example are stored in `example_packages/`. Three multi-pedestrian packages use
+PIE windows outside the 15 built-in scenes. Their format and regeneration
 command are documented in `example_packages/README.md`.
 
 ## Verification

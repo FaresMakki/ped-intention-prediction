@@ -157,17 +157,50 @@ export interface ComparisonMethod {
   is_correct: boolean;
 }
 
-export interface ComparisonResponse {
-  sample_id: string;
+export interface ComparisonAgreement {
+  unanimous: boolean;
+  crossing_votes: number;
+  not_crossing_votes: number;
+  correct_methods: number;
+  total_methods: number;
+}
+
+export interface PedestrianComparison {
+  pedestrian_id: string;
   sample_index: number;
   ground_truth: PredictionResponse["ground_truth"];
   methods: ComparisonMethod[];
-  agreement: {
-    unanimous: boolean;
-    crossing_votes: number;
-    not_crossing_votes: number;
-    correct_methods: number;
-    total_methods: number;
+  agreement: ComparisonAgreement;
+}
+
+export interface GlobalComparisonMethod {
+  id: string;
+  name: string;
+  short_name: string;
+  architecture: string;
+  role: string;
+  selection_note: string;
+  is_final: boolean;
+  metrics: ComparisonMetrics;
+  checkpoint: string;
+  binary_score: number;
+  binary_prediction: number;
+  binary_label: "Crossing" | "Not Crossing";
+  threshold: number;
+  crossing_pedestrian_ids: string[];
+  not_crossing_pedestrian_ids: string[];
+  is_correct: boolean;
+}
+
+export interface ComparisonResponse {
+  sample_id: string;
+  pedestrian_count: number;
+  pedestrians: PedestrianComparison[];
+  global_methods: GlobalComparisonMethod[];
+  global_ground_truth: {
+    binary_target: number;
+    binary_label: "Crossing" | "Not Crossing";
   };
+  agreement: ComparisonAgreement;
   latency_ms: number;
 }

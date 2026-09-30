@@ -84,18 +84,7 @@ class InferenceService:
         """Predict all annotated pedestrians together and aggregate scene risk."""
         started = time.perf_counter()
         members = self.repository.get_scene_members(sample_id)
-        with self._lock, torch.inference_mode():
-            trajectory_logits, social_logits = self._run_models_batch(
-                [tensors for _metadata, tensors in members]
-            )
-            predictions = [
-                self._format_prediction(
-                    metadata,
-                    trajectory_logits[index : index + 1],
-                    social_logits[index : index + 1],
-                )
-                for index, (metadata, _tensors) in enumerate(members)
-            ]
+        predictions = self.predict_members(members)
 
         latency_ms = round((time.perf_counter() - started) * 1000, 2)
         for prediction in predictions:
@@ -136,6 +125,27 @@ class InferenceService:
             },
             "latency_ms": latency_ms,
         }
+
+    def predict_members(
+        self,
+        members: list[tuple[dict[str, Any], SampleTensors]],
+    ) -> list[dict[str, Any]]:
+        """Run one batched source-model pass for aligned scene members."""
+        if not members:
+            raise ValueError("A scene must contain at least one pedestrian.")
+        with self._lock, torch.inference_mode():
+            trajectory_logits, social_logits = self._run_models_batch(
+                [tensors for _metadata, tensors in members]
+            )
+            predictions = [
+                self._format_prediction(
+                    metadata,
+                    trajectory_logits[index : index + 1],
+                    social_logits[index : index + 1],
+                )
+                for index, (metadata, _tensors) in enumerate(members)
+            ]
+        return predictions
 
     def predict_all(self) -> dict[str, Any]:
         started = time.perf_counter()

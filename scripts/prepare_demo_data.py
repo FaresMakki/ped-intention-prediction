@@ -180,12 +180,15 @@ def export_frames(
     rows: list[dict[str, str]],
     sample_id: str,
     boxes: dict[tuple[str, int], list[float]],
+    *,
+    frame_root: Path = FRAME_ROOT,
+    url_prefix: str = "/media",
 ) -> list[dict]:
     row = rows[0]
     frames = json.loads(row["frames"])
     if any(json.loads(candidate["frames"]) != frames for candidate in rows[1:]):
         raise RuntimeError(f"Pedestrians in {sample_id} do not share exact frames.")
-    destination = FRAME_ROOT / sample_id
+    destination = frame_root / sample_id
     destination.mkdir(parents=True, exist_ok=True)
     capture = cv2.VideoCapture(str(find_video(row["set_id"], row["video_id"])))
     if not capture.isOpened():
@@ -233,7 +236,7 @@ def export_frames(
                 {
                     "ordinal": ordinal,
                     "source_frame": source_frame,
-                    "url": f"/media/{sample_id}/{filename}",
+                    "url": f"{url_prefix.rstrip('/')}/{sample_id}/{filename}",
                     "target_box": pedestrian_boxes[0]["box"],
                     "pedestrian_boxes": pedestrian_boxes,
                 }

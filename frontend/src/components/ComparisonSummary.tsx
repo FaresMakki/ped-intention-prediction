@@ -19,7 +19,8 @@ export function ComparisonSummary({
         <p className="eyebrow">Decision room</p>
         <h2>Five-model comparison</h2>
         <p className="summary-description">
-          Run every selected checkpoint on the exact same 15-frame observation.
+          Run every checkpoint for every annotated pedestrian, then aggregate
+          one global scene decision per method.
         </p>
       </div>
 
@@ -45,6 +46,18 @@ export function ComparisonSummary({
             {comparison.agreement.correct_methods}/
             {comparison.agreement.total_methods} methods match the ground truth.
           </p>
+          <div className="global-method-results">
+            {comparison.global_methods.map((method) => (
+              <div className="global-method-result" key={method.id}>
+                <span>{method.short_name}</span>
+                <strong>{method.binary_label}</strong>
+                <small>
+                  {method.crossing_pedestrian_ids.length}/
+                  {comparison.pedestrian_count} pedestrians Crossing
+                </small>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="comparison-empty">
@@ -56,9 +69,15 @@ export function ComparisonSummary({
       )}
 
       <div className="comparison-truth">
-        <span>Ground truth</span>
+        <span>Global ground truth</span>
         <strong>
-          {sample ? (sample.binary_target ? "Crossing" : "Not Crossing") : "—"}
+          {comparison
+            ? comparison.global_ground_truth.binary_label
+            : sample
+              ? sample.binary_target
+                ? "Crossing"
+                : "Not Crossing"
+              : "—"}
         </strong>
       </div>
       <button
@@ -67,7 +86,9 @@ export function ComparisonSummary({
         onClick={onCompare}
         type="button"
       >
-        <span>{comparing ? "Running checkpoints…" : "Run comparison"}</span>
+        <span>
+          {comparing ? "Running checkpoints…" : "Run all pedestrians"}
+        </span>
         <span>→</span>
       </button>
       {comparison && (

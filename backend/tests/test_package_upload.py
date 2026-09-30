@@ -12,6 +12,11 @@ EXAMPLES = {
     "pie_crossing_example.zip": "sample-07",
     "pie_irrelevant_example.zip": "sample-12",
 }
+EXTERNAL_EXAMPLES = (
+    "pie_extra_no_crossing_4ped.zip",
+    "pie_extra_crossing_4ped_01.zip",
+    "pie_extra_crossing_4ped_02.zip",
+)
 
 
 def test_example_packages_upload_and_reproduce_prepared_inference() -> None:
@@ -79,8 +84,57 @@ def test_example_packages_upload_and_reproduce_prepared_inference() -> None:
         prepared_comparison = client.post(
             "/api/comparison/samples/sample-07/predict"
         ).json()
-        assert uploaded_comparison["methods"] == prepared_comparison["methods"]
+        assert uploaded_comparison["pedestrians"] == prepared_comparison["pedestrians"]
+        assert uploaded_comparison["global_methods"] == prepared_comparison[
+            "global_methods"
+        ]
+        assert uploaded_comparison["global_ground_truth"] == prepared_comparison[
+            "global_ground_truth"
+        ]
         assert uploaded_comparison["agreement"] == prepared_comparison["agreement"]
+
+
+def test_external_example_packages_are_not_builtin_scenes() -> None:
+    with TestClient(app) as client:
+        built_in_keys = set()
+        for summary in client.get("/api/samples").json():
+            sample = client.get(f"/api/samples/{summary['id']}").json()
+            built_in_keys.add(
+                (
+                    sample["set_id"],
+                    sample["video_id"],
+                    tuple(frame["source_frame"] for frame in sample["frames"]),
+                )
+            )
+
+        for filename in EXTERNAL_EXAMPLES:
+            content = (DEPLOYMENT_ROOT / "example_packages" / filename).read_bytes()
+            response = client.post(
+                "/api/uploads",
+                content=content,
+                headers={"Content-Type": "application/zip"},
+            )
+            assert response.status_code == 201, response.text
+            sample = response.json()["sample"]
+            scene_key = (
+                sample["set_id"],
+                sample["video_id"],
+                tuple(frame["source_frame"] for frame in sample["frames"]),
+            )
+            assert scene_key not in built_in_keys
+            assert sample["pedestrian_count"] == 4
+            assert all(len(frame["pedestrian_boxes"]) == 4 for frame in sample["frames"])
+
+            comparison = client.post(
+                f"/api/comparison/samples/{sample['id']}/predict"
+            ).json()
+            assert comparison["pedestrian_count"] == 4
+            assert len(comparison["pedestrians"]) == 4
+            assert len(comparison["global_methods"]) == 5
+            for method in comparison["global_methods"]:
+                assert len(method["crossing_pedestrian_ids"]) + len(
+                    method["not_crossing_pedestrian_ids"]
+                ) == 4
 
 
 def test_invalid_package_is_rejected_without_registration() -> None:

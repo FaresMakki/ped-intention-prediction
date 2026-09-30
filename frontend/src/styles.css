@@ -1148,6 +1148,35 @@ h2 {
   color: var(--muted);
   font-size: 10px;
 }
+.global-method-results {
+  display: grid;
+  gap: 5px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+.global-method-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px 10px;
+  align-items: center;
+}
+.global-method-result span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.global-method-result strong {
+  color: var(--text);
+  font-size: 10px;
+}
+.global-method-result small {
+  grid-column: 1 / -1;
+  color: #668174;
+  font-size: 8px;
+}
 .vote-meter {
   height: 5px;
   margin-top: 15px;
@@ -1162,6 +1191,12 @@ h2 {
 
 .comparison-board {
   margin-top: 24px;
+}
+.comparison-person-results {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.comparison-focus-heading {
+  margin-bottom: 9px;
 }
 .comparison-board-empty {
   min-height: 145px;

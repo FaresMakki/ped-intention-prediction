@@ -20,6 +20,7 @@ export function ComparisonPage() {
   const [selectedId, setSelectedId] = useState("");
   const [sample, setSample] = useState<SampleDetail | null>(null);
   const [comparison, setComparison] = useState<ComparisonResponse | null>(null);
+  const [focusedPedestrianId, setFocusedPedestrianId] = useState("");
   const [filter, setFilter] = useState<FilterName>("All");
   const [loadingSample, setLoadingSample] = useState(false);
   const [comparing, setComparing] = useState(false);
@@ -40,6 +41,7 @@ export function ComparisonPage() {
     if (!selectedId) return;
     setLoadingSample(true);
     setComparison(null);
+    setFocusedPedestrianId("");
     api
       .sample(selectedId)
       .then(setSample)
@@ -52,13 +54,20 @@ export function ComparisonPage() {
     setComparing(true);
     setError("");
     try {
-      setComparison(await api.compare(selectedId));
+      const result = await api.compare(selectedId);
+      setComparison(result);
+      setFocusedPedestrianId(result.pedestrians[0]?.pedestrian_id ?? "");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Comparison failed");
     } finally {
       setComparing(false);
     }
   }
+
+  const focusedComparison =
+    comparison?.pedestrians.find(
+      (person) => person.pedestrian_id === focusedPedestrianId,
+    ) ?? comparison?.pedestrians[0];
 
   async function uploadPackage(file: File) {
     setUploading(true);
@@ -141,21 +150,73 @@ export function ComparisonPage() {
             <div className="section-heading">
               <div>
                 <p className="eyebrow">Comparison board</p>
-                <h2>Aligned model decisions</h2>
+                <h2>Per-pedestrian model decisions</h2>
               </div>
               <p>
                 Every method uses the fixed binary mapping at threshold 0.5.
               </p>
             </div>
             {comparison ? (
-              <div className="comparison-methods">
-                {comparison.methods.map((method, index) => (
-                  <ComparisonMethodCard
-                    index={index}
-                    key={method.id}
-                    method={method}
-                  />
-                ))}
+              <div>
+                <div
+                  className="person-results comparison-person-results"
+                  aria-label="Pedestrian comparisons"
+                >
+                  {comparison.pedestrians.map((person) => {
+                    const pedestrian = sample?.pedestrians.find(
+                      (item) => item.pedestrian_id === person.pedestrian_id,
+                    );
+                    return (
+                      <button
+                        aria-pressed={
+                          person.pedestrian_id ===
+                          focusedComparison?.pedestrian_id
+                        }
+                        className={`person-result ${
+                          person.pedestrian_id ===
+                          focusedComparison?.pedestrian_id
+                            ? "active"
+                            : ""
+                        }`}
+                        key={person.pedestrian_id}
+                        onClick={() =>
+                          setFocusedPedestrianId(person.pedestrian_id)
+                        }
+                        type="button"
+                      >
+                        <span className="person-result-id">
+                          <i
+                            style={{
+                              background: pedestrian?.color ?? "#B1EF68",
+                            }}
+                          />
+                          {person.pedestrian_id}
+                        </span>
+                        <strong>
+                          {person.agreement.crossing_votes}/5 models Crossing
+                        </strong>
+                        <small>
+                          Ground truth {person.ground_truth.binary_label}
+                        </small>
+                      </button>
+                    );
+                  })}
+                </div>
+                {focusedComparison && (
+                  <div className="focused-person-heading comparison-focus-heading">
+                    <span>Detailed checkpoint outputs</span>
+                    <strong>{focusedComparison.pedestrian_id}</strong>
+                  </div>
+                )}
+                <div className="comparison-methods">
+                  {focusedComparison?.methods.map((method, index) => (
+                    <ComparisonMethodCard
+                      index={index}
+                      key={method.id}
+                      method={method}
+                    />
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="comparison-board-empty panel">
