@@ -151,8 +151,9 @@ pixels. It accepts two files from the same prepared example folder:
 
 The companion manifest contains the MP4 SHA-256 digest and playback metadata.
 The server validates that digest before registering the scene, so data from one
-example cannot silently be paired with another video. All pedestrians are then
-run through the same batched inference and global safety rule used elsewhere.
+example cannot silently be paired with another video. After validation enables
+the Run model action, all pedestrians can be evaluated through the same batched
+inference and global safety rule used elsewhere.
 Five complete examples are in `prepared_video_examples/` and can also be
 downloaded from the page.
 

@@ -55,7 +55,8 @@ export function PreparedVideoPage() {
     null,
   );
   const [focusedPedestrianId, setFocusedPedestrianId] = useState("");
-  const [working, setWorking] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [predicting, setPredicting] = useState(false);
   const [error, setError] = useState("");
 
@@ -71,24 +72,27 @@ export function PreparedVideoPage() {
       (person) => person.pedestrian_id === focusedPedestrianId,
     ) ?? prediction?.predictions[0];
 
-  async function uploadAndRun() {
+  async function uploadPair() {
     if (!videoFile || !packageFile) return;
-    setWorking(true);
+    setUploading(true);
+    setUploadProgress(0);
     setError("");
     setUpload(null);
     setPrediction(null);
     try {
-      const uploaded = await api.uploadPreparedVideo(videoFile, packageFile);
+      const uploaded = await api.uploadPreparedVideo(
+        videoFile,
+        packageFile,
+        setUploadProgress,
+      );
       setUpload(uploaded);
-      const result = await api.predictScene(uploaded.sample.id);
-      setPrediction(result);
-      setFocusedPedestrianId(result.predictions[0]?.pedestrian_id ?? "");
+      setFocusedPedestrianId("");
     } catch (reason) {
       setError(
-        reason instanceof Error ? reason.message : "Video analysis failed",
+        reason instanceof Error ? reason.message : "Video upload failed",
       );
     } finally {
-      setWorking(false);
+      setUploading(false);
     }
   }
 
@@ -113,6 +117,7 @@ export function PreparedVideoPage() {
     setUpload(null);
     setPrediction(null);
     setFocusedPedestrianId("");
+    setUploadProgress(0);
     setError("");
     if (videoInput.current) videoInput.current.value = "";
     if (packageInput.current) packageInput.current.value = "";
@@ -171,7 +176,7 @@ export function PreparedVideoPage() {
                   <input
                     accept=".mp4,video/mp4"
                     aria-label="Choose prepared MP4 video"
-                    disabled={working}
+                    disabled={uploading}
                     onChange={(event) =>
                       setVideoFile(event.target.files?.[0] ?? null)
                     }
@@ -191,7 +196,7 @@ export function PreparedVideoPage() {
                     </small>
                   </div>
                   <button
-                    disabled={working}
+                    disabled={uploading}
                     onClick={() => videoInput.current?.click()}
                     type="button"
                   >
@@ -205,7 +210,7 @@ export function PreparedVideoPage() {
                   <input
                     accept=".zip,application/zip"
                     aria-label="Choose companion data package"
-                    disabled={working}
+                    disabled={uploading}
                     onChange={(event) =>
                       setPackageFile(event.target.files?.[0] ?? null)
                     }
@@ -223,7 +228,7 @@ export function PreparedVideoPage() {
                     </small>
                   </div>
                   <button
-                    disabled={working}
+                    disabled={uploading}
                     onClick={() => packageInput.current?.click()}
                     type="button"
                   >
@@ -240,19 +245,53 @@ export function PreparedVideoPage() {
                 </p>
               </div>
 
-              <button
-                className="prepared-run-button primary-action"
-                disabled={!videoFile || !packageFile || working}
-                onClick={uploadAndRun}
-                type="button"
-              >
-                <span>
-                  {working
-                    ? "Validating pair and running all pedestrians"
-                    : "Upload pair and run the model"}
-                </span>
-                <span aria-hidden="true">{working ? "···" : "→"}</span>
-              </button>
+              {uploading && (
+                <div className="prepared-upload-progress" aria-live="polite">
+                  <div className="prepared-progress-label">
+                    <span>
+                      {uploadProgress < 100
+                        ? "Uploading video and companion data"
+                        : "Upload complete · validating matched pair"}
+                    </span>
+                    <strong>{uploadProgress}%</strong>
+                  </div>
+                  <div
+                    aria-label="Prepared video upload progress"
+                    aria-valuemax={100}
+                    aria-valuemin={0}
+                    aria-valuenow={uploadProgress}
+                    className="prepared-progress-track"
+                    role="progressbar"
+                  >
+                    <span style={{ width: `${uploadProgress}%` }} />
+                  </div>
+                </div>
+              )}
+
+              <div className="prepared-action-row">
+                <button
+                  className="prepared-upload-button primary-action"
+                  disabled={!videoFile || !packageFile || uploading}
+                  onClick={uploadPair}
+                  type="button"
+                >
+                  <span>
+                    {uploading
+                      ? uploadProgress < 100
+                        ? `Uploading ${uploadProgress}%`
+                        : "Validating uploaded pair"
+                      : "Upload and validate pair"}
+                  </span>
+                  <span aria-hidden="true">{uploading ? "···" : "↑"}</span>
+                </button>
+                <button
+                  className="prepared-locked-run secondary-action"
+                  disabled
+                  type="button"
+                >
+                  Run model · upload required
+                </button>
+              </div>
             </section>
 
             <section className="prepared-examples">
@@ -346,7 +385,7 @@ export function PreparedVideoPage() {
                 onFocusPedestrian={setFocusedPedestrianId}
                 onPredict={runPrediction}
                 prediction={prediction}
-                predicting={predicting || working}
+                predicting={predicting}
                 sample={upload.sample}
               />
             </div>

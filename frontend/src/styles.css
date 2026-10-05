@@ -1130,9 +1130,52 @@ h2 {
   color: var(--muted);
   font-size: 10px;
 }
-.prepared-run-button {
+.prepared-upload-progress {
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid #315441;
+  background: #0d1812;
+}
+.prepared-progress-label {
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.prepared-progress-label strong {
+  color: var(--green);
+  font:
+    700 11px/1 ui-monospace,
+    monospace;
+}
+.prepared-progress-track {
+  height: 7px;
+  overflow: hidden;
+  background: #25332c;
+}
+.prepared-progress-track span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  box-shadow: 0 0 14px rgba(105, 239, 176, 0.35);
+  transition: width 0.18s ease;
+}
+.prepared-action-row {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+}
+.prepared-upload-button {
   max-width: 430px;
-  margin: 18px 0 0 auto;
+  margin: 0;
+}
+.prepared-locked-run {
+  min-width: 205px;
+  height: 45px;
 }
 .prepared-examples {
   margin-top: 28px;
@@ -1294,6 +1337,14 @@ h2 {
   .prepared-video-meta {
     align-items: flex-start;
     flex-direction: column;
+  }
+  .prepared-action-row {
+    flex-direction: column;
+  }
+  .prepared-upload-button,
+  .prepared-locked-run {
+    width: 100%;
+    max-width: none;
   }
   .prepared-video-meta {
     padding-top: 12px;

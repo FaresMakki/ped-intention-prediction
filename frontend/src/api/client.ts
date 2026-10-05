@@ -21,6 +21,44 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+function uploadForm<T>(
+  path: string,
+  body: FormData,
+  onProgress: (percentage: number) => void,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", path);
+    xhr.responseType = "json";
+    xhr.upload.addEventListener("progress", (event) => {
+      if (!event.lengthComputable) return;
+      onProgress(Math.min(100, Math.round((event.loaded / event.total) * 100)));
+    });
+    xhr.addEventListener("load", () => {
+      const payload = xhr.response;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress(100);
+        resolve(payload as T);
+        return;
+      }
+      reject(
+        new Error(
+          payload?.detail ?? `Request failed with status ${xhr.status}`,
+        ),
+      );
+    });
+    xhr.addEventListener("error", () =>
+      reject(
+        new Error("Upload failed because the network connection was lost"),
+      ),
+    );
+    xhr.addEventListener("abort", () =>
+      reject(new Error("Upload was cancelled")),
+    );
+    xhr.send(body);
+  });
+}
+
 export const api = {
   health: () => request<HealthResponse>("/api/health"),
   samples: () => request<SampleSummary[]>("/api/samples"),
@@ -48,13 +86,18 @@ export const api = {
       },
       body: file,
     }),
-  uploadPreparedVideo: (video: File, packageFile: File) => {
+  uploadPreparedVideo: (
+    video: File,
+    packageFile: File,
+    onProgress: (percentage: number) => void,
+  ) => {
     const body = new FormData();
     body.append("video", video);
     body.append("package", packageFile);
-    return request<PreparedVideoUploadResponse>("/api/prepared-video/uploads", {
-      method: "POST",
+    return uploadForm<PreparedVideoUploadResponse>(
+      "/api/prepared-video/uploads",
       body,
-    });
+      onProgress,
+    );
   },
 };
