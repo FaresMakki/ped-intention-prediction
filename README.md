@@ -2,7 +2,7 @@
 
 This folder is a self-contained deployment of the final locked **Trajectory +
 Social classwise fusion (Rule B)** and a separate research comparison view. It
-uses 16 prepared scenes (17 annotated pedestrian tracks) from the PIE test
+uses 15 prepared scenes (33 annotated pedestrian tracks) from the PIE test
 split and performs live checkpoint inference when the user starts an analysis.
 
 Runtime inference never reads saved logits. Each request loads the aligned graph
@@ -16,6 +16,9 @@ same fixed binary mapping used by the experiments.
 - **Compare models** (`#/comparison`) runs five methods on the same selected
   sequence: final Trajectory + Social, Relation-Risk, Environment,
   Environment + Skeleton, and Skeleton.
+- **Video upload** (`#/prepared-video`) accepts a matched 15-frame MP4 and
+  companion data package. The video presents the observation while the package
+  provides exact PIE annotations, sensor features, masks, and checkpoint inputs.
 
 The comparison page separates two kinds of evidence:
 
@@ -47,13 +50,15 @@ must not be used to choose a model.
 - `backend/app/services/` — final-model inference and comparison orchestration.
 - `backend/tests/` — API, fusion, and original-artifact parity tests.
 - `frontend/src/pages/` — independent live-fusion and comparison pages.
-- `data/` — 16 scenes, 17 aligned pedestrian tensor bundles, and 240 frames.
+- `data/` — 15 scenes, 33 aligned pedestrian tensor bundles, and 225 frames.
+- `prepared_video_examples/` — five matched MP4/data pairs outside the built-in
+  scene collection.
 - `scripts/prepare_demo_data.py` — reproducible aligned sample exporter.
 
-The original demo remains balanced: five raw No Crossing, five Crossing, and
-five Irrelevant examples. A sixteenth scene contains two pedestrians annotated
-over the same 15 frames. They are evaluated in one model batch, and the global
-result is Crossing whenever any pedestrian prediction is Crossing.
+The demo remains balanced: five raw No Crossing, five Crossing, and five
+Irrelevant examples. Every scene contains multiple pedestrians annotated over
+the same 15 frames. They are evaluated in one model batch, and the global result
+is Crossing whenever any pedestrian prediction is Crossing.
 
 ## Final inference path
 
@@ -115,6 +120,9 @@ requests to port 8000.
   all five methods and return individual plus global scene comparisons.
 - `POST /api/uploads` — validate and register one versioned package ZIP.
 - `GET /api/uploads/{id}/frames/{ordinal}` — serve a validated uploaded frame.
+- `POST /api/prepared-video/uploads` — validate and register one matched MP4
+  and companion-data pair.
+- `GET /api/prepared-video/uploads/{id}/video` — serve its validated MP4.
 - `GET /openapi.json` — OpenAPI schema.
 
 ## Package upload
@@ -131,6 +139,22 @@ Six ready-to-upload multi-pedestrian examples and one legacy compatibility
 example are stored in `example_packages/`. Three multi-pedestrian packages use
 PIE windows outside the 15 built-in scenes. Their format and regeneration
 command are documented in `example_packages/README.md`.
+
+## Prepared video upload
+
+The separate video page deliberately does not claim to infer tensors from raw
+pixels. It accepts two files from the same prepared example folder:
+
+- `clip.mp4` presents the exact 15-frame annotated observation;
+- `clip_data.zip` contains the version-2 model tensors, metadata, frame images,
+  pedestrian boxes, sensor-derived features, masks, and labels.
+
+The companion manifest contains the MP4 SHA-256 digest and playback metadata.
+The server validates that digest before registering the scene, so data from one
+example cannot silently be paired with another video. All pedestrians are then
+run through the same batched inference and global safety rule used elsewhere.
+Five complete examples are in `prepared_video_examples/` and can also be
+downloaded from the page.
 
 ## Verification
 

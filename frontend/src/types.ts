@@ -25,7 +25,7 @@ export interface SampleSummary {
   binary_target: number;
   pedestrian_count: number;
   poster_url: string;
-  source: "prepared" | "upload";
+  source: "prepared" | "upload" | "prepared-video";
 }
 
 export interface PedestrianFrameBox {
@@ -61,6 +61,21 @@ export interface SampleDetail extends Omit<SampleSummary, "poster_url"> {
 export interface PackageUploadResponse {
   summary: SampleSummary;
   sample: SampleDetail;
+}
+
+export interface PreparedVideoInfo {
+  file_name: string;
+  url: string;
+  sha256: string;
+  frame_count: number;
+  playback_fps: number;
+  source_fps: number;
+  width: number;
+  height: number;
+}
+
+export interface PreparedVideoUploadResponse extends PackageUploadResponse {
+  video: PreparedVideoInfo;
 }
 
 export interface SourceOutput {

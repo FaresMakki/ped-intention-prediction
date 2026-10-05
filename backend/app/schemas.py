@@ -80,6 +80,23 @@ class PackageUploadResponse(ApiModel):
     sample: SampleDetail
 
 
+class PreparedVideoInfo(ApiModel):
+    file_name: str
+    url: str
+    sha256: str
+    frame_count: int
+    playback_fps: float
+    source_fps: float
+    width: int
+    height: int
+
+
+class PreparedVideoUploadResponse(ApiModel):
+    summary: SampleSummary
+    sample: SampleDetail
+    video: PreparedVideoInfo
+
+
 class PredictionResponse(ApiModel):
     sample_id: str
     sample_index: int

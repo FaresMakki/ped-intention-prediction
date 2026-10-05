@@ -163,6 +163,20 @@ class PackagePedestrian(BaseModel):
     color: str | None = Field(default=None, pattern=r"^#[0-9A-Fa-f]{6}$")
 
 
+class PackageVideo(BaseModel):
+    """Identity and playback metadata for an external prepared-video file."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    file_name: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,119}\.mp4$")
+    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    frame_count: Literal[FRAME_COUNT]
+    playback_fps: float = Field(gt=0.0, le=60.0)
+    source_fps: float = Field(gt=0.0, le=120.0)
+    width: int = Field(gt=0, le=8192)
+    height: int = Field(gt=0, le=8192)
+
+
 class PackageManifestV1(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -194,6 +208,7 @@ class PackageManifestV2(BaseModel):
     display_name: str = Field(min_length=1, max_length=80)
     set_id: str = Field(pattern=r"^set\d{2}$")
     video_id: str = Field(pattern=r"^video_\d{4}$")
+    video: PackageVideo | None = None
     pedestrians: list[PackagePedestrian] = Field(
         min_length=1,
         max_length=MAX_PEDESTRIANS,
@@ -212,6 +227,7 @@ class LoadedPackage:
     metadata: dict
     tensors: list[SampleTensors]
     frames: dict[int, UploadedFrame]
+    video: PackageVideo | None
 
 
 def _safe_members(archive: zipfile.ZipFile) -> dict[str, zipfile.ZipInfo]:
@@ -492,4 +508,10 @@ def load_package(payload: bytes) -> LoadedPackage:
         "pedestrians": public_pedestrians,
         "frames": frame_metadata,
     }
-    return LoadedPackage(metadata=metadata, tensors=tensors, frames=frames)
+    video = manifest.video if isinstance(manifest, PackageManifestV2) else None
+    return LoadedPackage(
+        metadata=metadata,
+        tensors=tensors,
+        frames=frames,
+        video=video,
+    )

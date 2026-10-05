@@ -58,5 +58,9 @@ class Settings:
     def frontend_dist(self) -> Path:
         return self.deployment_root / "frontend" / "dist"
 
+    @property
+    def prepared_video_examples_dir(self) -> Path:
+        return self.deployment_root / "prepared_video_examples"
+
 
 settings = Settings()

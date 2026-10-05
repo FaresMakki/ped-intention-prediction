@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { ComparisonPage } from "./pages/ComparisonPage";
 import { LiveFusionPage } from "./pages/LiveFusionPage";
+import { PreparedVideoPage } from "./pages/PreparedVideoPage";
 
-type Page = "live" | "comparison";
+type Page = "live" | "comparison" | "prepared-video";
 
 function pageFromHash(): Page {
-  return window.location.hash === "#/comparison" ? "comparison" : "live";
+  if (window.location.hash === "#/comparison") return "comparison";
+  if (window.location.hash === "#/prepared-video") return "prepared-video";
+  return "live";
 }
 
 function App() {
@@ -17,7 +20,9 @@ function App() {
     return () => window.removeEventListener("hashchange", updatePage);
   }, []);
 
-  return page === "comparison" ? <ComparisonPage /> : <LiveFusionPage />;
+  if (page === "comparison") return <ComparisonPage />;
+  if (page === "prepared-video") return <PreparedVideoPage />;
+  return <LiveFusionPage />;
 }
 
 export default App;

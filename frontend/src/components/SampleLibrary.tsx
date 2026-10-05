@@ -79,7 +79,7 @@ export function SampleLibrary({
               {sample.pedestrian_count > 1 && (
                 <span className="parallel-pill">Parallel</span>
               )}
-              {sample.source === "upload" && (
+              {sample.source !== "prepared" && (
                 <span className="upload-pill">Uploaded</span>
               )}
             </span>

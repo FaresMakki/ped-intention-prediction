@@ -51,6 +51,12 @@ def create_app() -> FastAPI:
     )
     app.include_router(router)
     app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
+    if settings.prepared_video_examples_dir.exists():
+        app.mount(
+            "/prepared-video-examples",
+            StaticFiles(directory=settings.prepared_video_examples_dir),
+            name="prepared-video-examples",
+        )
     if settings.frontend_dist.exists():
         app.mount(
             "/",

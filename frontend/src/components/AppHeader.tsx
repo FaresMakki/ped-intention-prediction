@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { BrandMark } from "./BrandMark";
 
 interface AppHeaderProps {
-  activePage: "live" | "comparison";
+  activePage: "live" | "comparison" | "prepared-video";
   subtitle: string;
   actions: ReactNode;
 }
@@ -27,6 +27,12 @@ export function AppHeader({ activePage, subtitle, actions }: AppHeaderProps) {
           href="#/comparison"
         >
           Compare models
+        </a>
+        <a
+          className={activePage === "prepared-video" ? "active" : ""}
+          href="#/prepared-video"
+        >
+          Video upload
         </a>
       </nav>
 

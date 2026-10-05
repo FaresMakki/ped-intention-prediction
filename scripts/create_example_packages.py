@@ -10,6 +10,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+import cv2
 import numpy as np
 from prepare_demo_data import (
     CLASS_NAMES,
@@ -24,6 +25,8 @@ from prepare_demo_data import (
 DEPLOYMENT_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = DEPLOYMENT_ROOT / "data"
 OUTPUT_ROOT = DEPLOYMENT_ROOT / "example_packages"
+PREPARED_VIDEO_ROOT = DEPLOYMENT_ROOT / "prepared_video_examples"
+PREPARED_VIDEO_FPS = 10.0
 PREPARED_EXAMPLES = {
     "sample-01": "pie_no_crossing_example.zip",
     "sample-07": "pie_crossing_example.zip",
@@ -34,6 +37,13 @@ EXTERNAL_EXAMPLES = {
     "pie_extra_no_crossing_4ped.zip": (584, 585, 586, 587),
     "pie_extra_crossing_4ped_01.zip": (683, 684, 686, 687),
     "pie_extra_crossing_4ped_02.zip": (758, 759, 760, 762),
+}
+PREPARED_VIDEO_EXAMPLES = {
+    "01_no_crossing_4ped": (584, 585, 586, 587),
+    "02_crossing_4ped": (683, 684, 686, 687),
+    "03_crossing_4ped": (758, 759, 760, 762),
+    "04_irrelevant_4ped": (1043, 1044, 1045, 1046),
+    "05_no_crossing_4ped": (1106, 1107, 1108, 1109),
 }
 ARRAY_NAMES = (
     "trajectory_nodes",
@@ -82,8 +92,8 @@ def tensor_archive(
     return stream.getvalue()
 
 
-def package_manifest_v2(sample: dict) -> dict:
-    return {
+def package_manifest_v2(sample: dict, video: dict | None = None) -> dict:
+    manifest = {
         "format": "pie-crossing-package",
         "version": 2,
         "frame_count": 15,
@@ -118,6 +128,9 @@ def package_manifest_v2(sample: dict) -> dict:
             for frame in sample["frames"]
         ],
     }
+    if video is not None:
+        manifest["video"] = video
+    return manifest
 
 
 def package_manifest_v1(sample: dict) -> dict:
@@ -154,8 +167,13 @@ def write_package(
     *,
     frame_root: Path = DATA_ROOT / "frames",
     legacy: bool = False,
+    video: dict | None = None,
 ) -> None:
-    manifest = package_manifest_v1(sample) if legacy else package_manifest_v2(sample)
+    manifest = (
+        package_manifest_v1(sample)
+        if legacy
+        else package_manifest_v2(sample, video)
+    )
     manifest_bytes = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
     tensor_indices = [
         int(pedestrian["tensor_index"])
@@ -182,6 +200,44 @@ def write_package(
                 zip_info(f"frames/{name}", zipfile.ZIP_STORED),
                 content,
             )
+
+
+def write_video(destination: Path, frame_directory: Path) -> dict:
+    """Encode the exact 15 annotated observation frames for presentation."""
+    paths = [frame_directory / f"frame_{ordinal:02d}.jpg" for ordinal in range(1, 16)]
+    first = cv2.imread(str(paths[0]), cv2.IMREAD_COLOR)
+    if first is None:
+        raise RuntimeError(f"Could not read {paths[0]} for video export.")
+    height, width = first.shape[:2]
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    writer = cv2.VideoWriter(
+        str(destination),
+        cv2.VideoWriter_fourcc(*"mp4v"),
+        PREPARED_VIDEO_FPS,
+        (width, height),
+    )
+    if not writer.isOpened():
+        raise RuntimeError(f"Could not create {destination}.")
+    try:
+        for path in paths:
+            image = cv2.imread(str(path), cv2.IMREAD_COLOR)
+            if image is None or image.shape[:2] != (height, width):
+                raise RuntimeError(f"Invalid prepared-video frame {path}.")
+            writer.write(image)
+    finally:
+        writer.release()
+    payload = destination.read_bytes()
+    if len(payload) < 12 or payload[4:8] != b"ftyp":
+        raise RuntimeError(f"Video encoder did not create a valid MP4: {destination}")
+    return {
+        "file_name": destination.name,
+        "sha256": hashlib.sha256(payload).hexdigest(),
+        "frame_count": 15,
+        "playback_fps": PREPARED_VIDEO_FPS,
+        "source_fps": 30.0,
+        "width": width,
+        "height": height,
+    }
 
 
 def source_arrays() -> tuple[list[dict[str, str]], dict[str, np.ndarray]]:
@@ -358,7 +414,11 @@ def main() -> None:
     }
     with tempfile.TemporaryDirectory(prefix="pie-upload-examples-") as directory:
         frame_root = Path(directory)
-        for number, (filename, indices) in enumerate(EXTERNAL_EXAMPLES.items(), start=1):
+        all_index_groups = list(EXTERNAL_EXAMPLES.values())
+        all_index_groups.extend(PREPARED_VIDEO_EXAMPLES.values())
+        unique_index_groups = list(dict.fromkeys(all_index_groups))
+        external_samples: dict[tuple[int, ...], dict] = {}
+        for number, indices in enumerate(unique_index_groups, start=1):
             rows = [rows_by_index[index] for index in indices]
             sample = external_sample(
                 rows,
@@ -366,6 +426,10 @@ def main() -> None:
                 frame_root,
                 built_in_keys,
             )
+            external_samples[indices] = sample
+
+        for filename, indices in EXTERNAL_EXAMPLES.items():
+            sample = external_samples[indices]
             destination = OUTPUT_ROOT / filename
             write_package(
                 destination,
@@ -374,6 +438,25 @@ def main() -> None:
                 frame_root=frame_root,
             )
             print_package(destination)
+
+        PREPARED_VIDEO_ROOT.mkdir(parents=True, exist_ok=True)
+        for folder_name, indices in PREPARED_VIDEO_EXAMPLES.items():
+            sample = external_samples[indices]
+            destination = PREPARED_VIDEO_ROOT / folder_name
+            video = write_video(
+                destination / "clip.mp4",
+                frame_root / sample["id"],
+            )
+            package = destination / "clip_data.zip"
+            write_package(
+                package,
+                sample,
+                all_arrays,
+                frame_root=frame_root,
+                video=video,
+            )
+            print_package(destination / "clip.mp4")
+            print_package(package)
 
 
 if __name__ == "__main__":

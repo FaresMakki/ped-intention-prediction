@@ -15,6 +15,7 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend/app ./backend/app
 COPY models ./models
 COPY data ./data
+COPY prepared_video_examples ./prepared_video_examples
 COPY --from=frontend-builder /build/frontend/dist ./frontend/dist
 EXPOSE 8000
 CMD ["sh", "-c", "exec uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port ${PORT:-8000}"]

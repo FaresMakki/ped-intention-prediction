@@ -37,6 +37,19 @@ class UploadedFrame:
     media_type: str
 
 
+@dataclass(frozen=True)
+class UploadedVideo:
+    content: bytes
+    file_name: str
+    sha256: str
+    frame_count: int
+    playback_fps: float
+    source_fps: float
+    width: int
+    height: int
+    media_type: str = "video/mp4"
+
+
 class SampleRepository:
     """Expose prepared samples plus validated, in-memory package uploads."""
 
@@ -84,6 +97,7 @@ class SampleRepository:
         self._uploaded_metadata: dict[str, dict[str, Any]] = {}
         self._uploaded_tensors: dict[str, list[SampleTensors]] = {}
         self._uploaded_frames: dict[str, dict[int, UploadedFrame]] = {}
+        self._uploaded_videos: dict[str, UploadedVideo] = {}
         self._lock = RLock()
 
     @property
@@ -128,9 +142,9 @@ class SampleRepository:
     ) -> list[tuple[dict[str, Any], SampleTensors]]:
         """Return every annotated pedestrian and tensor bundle for one scene."""
         metadata = self.get_metadata(sample_id)
-        if metadata["source"] == "upload":
-            with self._lock:
-                uploaded_tensors = self._uploaded_tensors[sample_id]
+        with self._lock:
+            uploaded_tensors = self._uploaded_tensors.get(sample_id)
+        if uploaded_tensors is not None:
             pedestrians = self._pedestrians(metadata)
             if len(pedestrians) != len(uploaded_tensors):
                 raise ValueError("Uploaded pedestrian metadata and tensors are misaligned.")
@@ -140,7 +154,7 @@ class SampleRepository:
                         **metadata,
                         **pedestrian,
                         "id": sample_id,
-                        "source": "upload",
+                        "source": metadata["source"],
                     },
                     tensors,
                 )
@@ -188,6 +202,9 @@ class SampleRepository:
         metadata: dict[str, Any],
         tensors: list[SampleTensors],
         frames: dict[int, UploadedFrame],
+        *,
+        source: str = "upload",
+        video: UploadedVideo | None = None,
     ) -> dict[str, Any]:
         """Register one validated single- or multi-pedestrian package."""
         pedestrians = self._pedestrians(metadata)
@@ -205,7 +222,7 @@ class SampleRepository:
             **metadata,
             "id": sample_id,
             "tensor_index": -1,
-            "source": "upload",
+            "source": source,
             "pedestrian_count": len(pedestrians),
             "pedestrians": pedestrians,
             "frames": public_frames,
@@ -214,6 +231,8 @@ class SampleRepository:
             self._uploaded_metadata[sample_id] = public_metadata
             self._uploaded_tensors[sample_id] = list(tensors)
             self._uploaded_frames[sample_id] = frames
+            if video is not None:
+                self._uploaded_videos[sample_id] = video
         return dict(public_metadata)
 
     def get_uploaded_frame(self, sample_id: str, ordinal: int) -> UploadedFrame:
@@ -224,6 +243,13 @@ class SampleRepository:
                 raise KeyError(
                     f"Unknown uploaded frame: {sample_id}/{ordinal}"
                 ) from error
+
+    def get_uploaded_video(self, sample_id: str) -> UploadedVideo:
+        with self._lock:
+            try:
+                return self._uploaded_videos[sample_id]
+            except KeyError as error:
+                raise KeyError(f"Unknown uploaded video: {sample_id}") from error
 
     @staticmethod
     def _pedestrians(sample: dict[str, Any]) -> list[dict[str, Any]]:

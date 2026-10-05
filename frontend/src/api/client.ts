@@ -3,6 +3,7 @@ import type {
   ComparisonResponse,
   HealthResponse,
   PackageUploadResponse,
+  PreparedVideoUploadResponse,
   PredictionResponse,
   ScenePredictionResponse,
   SampleDetail,
@@ -47,4 +48,13 @@ export const api = {
       },
       body: file,
     }),
+  uploadPreparedVideo: (video: File, packageFile: File) => {
+    const body = new FormData();
+    body.append("video", video);
+    body.append("package", packageFile);
+    return request<PreparedVideoUploadResponse>("/api/prepared-video/uploads", {
+      method: "POST",
+      body,
+    });
+  },
 };
