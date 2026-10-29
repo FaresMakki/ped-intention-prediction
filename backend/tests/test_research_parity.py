@@ -14,8 +14,8 @@ def test_prepared_samples_reproduce_research_outputs() -> None:
     research_root = settings.deployment_root.parent / "PIE"
     precomputed = (
         research_root
-        / "outputs/BinaryPrediction"
-        / "FusionThreeClassTrajectorySocialInteraction/precomputed"
+        / "BinaryPrediction/FusionThreeClassTrajectorySocialClasswiseLocked"
+        / "assets/source_model_outputs"
     )
     prediction_csv = (
         research_root
