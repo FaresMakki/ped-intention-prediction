@@ -151,11 +151,6 @@ export function PreparedVideoPage() {
             <p className="eyebrow">Experimental presentation input</p>
             <h1>Upload a video with its exact observation data.</h1>
           </div>
-          <p>
-            The MP4 presents the 15-frame scene. Its matching package supplies
-            the annotations, sensor features, masks, and model tensors—no YOLO
-            approximation is used.
-          </p>
         </header>
 
         {!upload ? (
@@ -235,14 +230,6 @@ export function PreparedVideoPage() {
                     {packageFile ? "Change" : "Choose data"}
                   </button>
                 </div>
-              </div>
-
-              <div className="prepared-validation-note">
-                <span>SHA-256 pair validation</span>
-                <p>
-                  The server rejects a video paired with data from a different
-                  scene before registering or running it.
-                </p>
               </div>
 
               {uploading && (

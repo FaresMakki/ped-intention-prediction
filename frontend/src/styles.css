@@ -998,10 +998,6 @@ h2 {
   padding: 34px 0 52px;
 }
 .prepared-video-intro {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 34px;
   margin-bottom: 24px;
 }
 .prepared-video-intro h1 {
@@ -1010,14 +1006,6 @@ h2 {
   font-size: clamp(30px, 4vw, 50px);
   line-height: 1.02;
   letter-spacing: -0.05em;
-}
-.prepared-video-intro > p {
-  max-width: 430px;
-  margin: 0 0 4px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.65;
-  text-align: right;
 }
 .prepared-upload-panel {
   padding: 22px;
@@ -1107,28 +1095,6 @@ h2 {
 }
 .prepared-file-card button:hover:not(:disabled) {
   border-color: #52705f;
-}
-.prepared-validation-note {
-  margin-top: 12px;
-  padding: 11px 13px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  border: 1px solid #24382e;
-  background: #0b120e;
-}
-.prepared-validation-note span {
-  flex: 0 0 auto;
-  color: var(--green);
-  font:
-    700 9px/1 ui-monospace,
-    monospace;
-  text-transform: uppercase;
-}
-.prepared-validation-note p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 10px;
 }
 .prepared-upload-progress {
   margin-top: 14px;
@@ -1313,14 +1279,6 @@ h2 {
     width: min(100% - 24px, 1280px);
     padding-top: 24px;
   }
-  .prepared-video-intro {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .prepared-video-intro > p {
-    text-align: left;
-  }
   .prepared-upload-grid,
   .prepared-example-grid,
   .prepared-provenance {
@@ -1333,7 +1291,6 @@ h2 {
     grid-column: 2;
     width: max-content;
   }
-  .prepared-validation-note,
   .prepared-video-meta {
     align-items: flex-start;
     flex-direction: column;
